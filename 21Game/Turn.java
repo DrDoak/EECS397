@@ -68,5 +68,7 @@ class Turn implements ITurn {
 	int r1 = t1.roll(); 
 	Tester.check(1 <= r1 && r1 <= 6,"roll 1"); 
 	Tester.check(r1 == s1.sum,"roll 2"); 
+	
+	
     }
 }

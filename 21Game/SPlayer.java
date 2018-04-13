@@ -19,9 +19,7 @@ class SPlayer {
     public void skipsrecord (boolean firstRoll) {
     	if(done)
     		skips = 0;
-    	else 
-    		skips = skips - 1;
-    	
+
     	if (skips > 0 && firstRoll) {
 			skips--;
 		}
@@ -67,11 +65,13 @@ class SPlayer {
     // Examples: 
     static MPlayer m1;
     static SPlayer s1;
+    static SPlayer s2;
 
     static public void createExamples() {
 	if (m1 == null) {
 	    m1 = new MPlayer("machine play for test of splayer");
 	    s1 = new SPlayer(m1);
+	    s2 = new SPlayer(m1);
 	} 
     }
 
@@ -81,7 +81,20 @@ class SPlayer {
 	createExamples();
 
 	m1.registerDisplay(TestIDisplay.testIDisplay);
+	
+	Tester.check(s2.skips == 2, "skip initialization");
+	s2.skipsrecord(true);
+	Tester.check(s2.skips == 1, "skip decrement");
 
+	s2.skipsrecord(false);
+	Tester.check(s2.skips == 1, "skip no decrement");
+	
+	s2.skipsrecord(true);
+	Tester.check(s2.skips == 0, "skip decrement 2");
+	
+	s2.skipsrecord(true);
+	Tester.check(s2.done, "skip termination");
+	
 	s1.record(6);
 	Tester.check(s1.sum == 6,"record 6"); 
 
@@ -95,7 +108,8 @@ class SPlayer {
 	// calling record in improper context 
 	s1.record(3); 
 	Tester.check(s1.sum == 0,"done 21"); 
-
+	
+	
 	s1.cheat(); 
 	Tester.check(s1.done,"cheat 1"); 
 	Tester.check(s1.sum == 0,"cheat 2"); 

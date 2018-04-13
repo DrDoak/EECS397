@@ -97,8 +97,11 @@ class HPlayer extends Player {
 
 	h1.inform("welcome to human player 1");
 	
+	Tester.check(t1.firstroll, "first roll");
 	boolean done = h1.turn(t1);
 	done = h1.turn(t1); 
+	Tester.check(!t1.firstroll, "second roll");
+	
 	Tester.check(s1.done,"human cheat"); 
 	
 	done = h1.turn(t2); 
@@ -109,7 +112,6 @@ class HPlayer extends Player {
 	Tester.check(s1.done,"human cheat 3"); 
 	Tester.check(s1.sum == 0,"human cheat 4"); 
 	
-	s1.skips = 1;
 	
     }
 
