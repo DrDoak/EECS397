@@ -15,11 +15,10 @@ public class Tile {
 		m_rotation = Direction.UP;
 		m_paths = pathList;
 	}
-	public Vector2Int PlaceTile(Vector2Int c, Direction r) {
+	public void PlaceTile(Vector2Int c, Direction r) {
 		Coordinate = c;
 		m_rotation = r;
 		SetRotation (r);
-		return Coordinate;
 	}
 
 	public void SetRotation ( Direction r)
@@ -51,10 +50,11 @@ public class Tile {
 	public void RemovePiece(SPlayer sp) {
 		PlayersOnTile.Remove (sp);
 	}
-	public List<SPlayer> GetAdjacentPlayers(Direction d) {
+	public List<SPlayer> GetAdjacentPlayers(Tile t) {
 		List<SPlayer> ls = new List<SPlayer> ();
+		Vector2Int diff = t.Coordinate - Coordinate;
 		foreach (SPlayer p in PlayersOnTile) {
-			if (p.IsOnDirection (d))
+			if (p.IsOnDirection (DirectionUtils.VectorToDirection(diff)))
 				ls.Add (p);
 		}
 		return ls;

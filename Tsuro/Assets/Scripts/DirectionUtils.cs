@@ -47,6 +47,32 @@ public static class DirectionUtils {
 		}
 	}
 
+	public static Vector2Int DirectionToVector(Direction r)
+	{
+		if (r == Direction.UP)
+			return new Vector2Int(0,1);
+		if (r == Direction.RIGHT)
+			return new Vector2Int(1,0);
+		if (r == Direction.DOWN)
+			return new Vector2Int(0,-1);
+		if (r == Direction.LEFT)
+			return new Vector2Int(-1,0);
+		return new Vector2Int(0,0);
+	}
+
+	public static Direction VectorToDirection(Vector2Int v)
+	{
+		if (v == new Vector2Int(0,1))
+			return Direction.UP;
+		if (v == new Vector2Int(1,0))
+			return  Direction.RIGHT;
+		if (v == new Vector2Int(0,-1))
+			return Direction.DOWN;
+		if (v == new Vector2Int(-1,0))
+			return  Direction.LEFT;
+		return Direction.NONE;
+	}
+
 	public static void Tests() {
 		Debug.Log ("Running Tests in DirectionUtils");
 
@@ -67,7 +93,14 @@ public static class DirectionUtils {
 		Debug.Assert (IntToDirection(4) == Direction.DOWN, "Integer to correct direction");
 		Debug.Assert (IntToDirection(-1) == Direction.NONE, "Invalid direction found");
 		Debug.Assert (IntToDirection(14) == Direction.NONE, "Invalid direction found");
-		p.MoveToPosition (t, 7);
+
+		p.MoveToPosition (t.Coordinate, 7);
 		Debug.Assert (p.IsOnDirection (Direction.LEFT), "Detected Correct Direction");
+
+		Debug.Assert (DirectionToVector(Direction.LEFT) == new Vector2Int(-1,0), "Direction to Vector");
+		Debug.Assert (DirectionToVector(Direction.NONE) == new Vector2Int(0,0), "Invalid direction found");
+
+		Debug.Assert (VectorToDirection(new Vector2Int(-1,0)) == Direction.LEFT , "Vector to Direction");
+		Debug.Assert (VectorToDirection(new Vector2Int(0,0)) == Direction.NONE , "Invalid vector found");
 	}
 }

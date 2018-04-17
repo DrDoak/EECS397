@@ -21,7 +21,7 @@ public class Administrator {
 
     bool HasLegalMoves (SPlayer sp, Board b)
     {
-        foreach (Spaces s in b.FreeSpaces)
+       /* foreach (Spaces s in b.FreeSpaces)
         {
             foreach (Tile t in sp.Hand)
             {
@@ -33,7 +33,7 @@ public class Administrator {
                     };
                 }
             }
-        }
+        }*/
    
         return false;
     }
@@ -58,8 +58,8 @@ public class Administrator {
      
         if(!EliminatesActivePlayer(ActivePlayer, b, PlacedTile))
          {
-            b.Draw(DrawPile, ActivePlayer);
-            b.AdvanceTurns(PlayersIn);
+           // b.Draw(DrawPile, ActivePlayer);
+          //  b.AdvanceTurns(PlayersIn);
         }
         else {
             b.RemovePlayer(PlayersIn, PlayersOut);

@@ -8,7 +8,7 @@ public class SPlayer {
     public int PositionOnTile { get; private set; }
 
 	private Color m_color;
-	public Tile Tile { get; private set; }
+	public Vector2Int Coordinate;
 
 	public SPlayer() {
 		Hand = new List<Tile> ();
@@ -33,13 +33,13 @@ public class SPlayer {
     {
 		return DirectionUtils.DirectionMatch (r, PositionOnTile);
     }
-	public void MoveToPosition(Tile t, int position) {
-		Tile = t;
-		PositionOnTile = position;
+	public void MoveToPosition(Vector2Int pos , int tilePos) {
+		Coordinate = pos;
+		PositionOnTile = tilePos;
 	}
 
 	public void EliminatePiece() {
-		Tile.RemovePiece (this);
+		//Tile.RemovePiece (this);
 	}
 	public int AdjacentPos() {
 		if (PositionOnTile % 2 == 0)
@@ -63,7 +63,7 @@ public class SPlayer {
 		p.PlayTile (t);
 		Debug.Assert (!p.IsInHand (t), "Basic Hand Tile Playing");
 
-		p.MoveToPosition (t, 7);
+		p.MoveToPosition (t.Coordinate, 7);
 		Debug.Assert (p.IsOnDirection (Direction.LEFT), "Detected Correct Direction");
 	}
 }
