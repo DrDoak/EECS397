@@ -16,7 +16,9 @@ public class Main : MonoBehaviour {
 		Vector2 testResults = new Vector2 ();
 		Tile.Tests ();
 		SPlayer.Tests ();
+		DirectionUtils.Tests ();
 		Board.Tests ();
 		Administrator.Tests ();
+
 	}
 }

@@ -27,7 +27,7 @@ public class Administrator {
             {
                 for (int i = 0; i < 4; i++)
                 {
-                    t.SetRotation((Rotation)i);
+					t.SetRotation((Direction)i);
                     if (!EliminatesActivePlayer(sp, b, t)) {
                         return true;
                     };

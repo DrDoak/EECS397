@@ -2,21 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum Direction { NONE, LEFT, RIGHT, UP, DOWN }
-
-public class SPlayer : MonoBehaviour {
+public class SPlayer {
 
     public List<Tile> Hand { get; private set; }
-    public Vector2 Position { get; private set; }
-    public Vector2 PositionOnTile { get; private set; }
+    public int PositionOnTile { get; private set; }
+
+	private Color m_color;
+	public Tile Tile { get; private set; }
+
+	public SPlayer() {
+		Hand = new List<Tile> ();
+	}
 
     public void AddToHand(Tile t)
     {
         Hand.Add(t);
-        return;
     }
-        
-    private string Color;
 
     public bool IsInHand (Tile t)
     {
@@ -24,26 +25,45 @@ public class SPlayer : MonoBehaviour {
         { return true; }
         else { return false; }
     }
-
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+	public void PlayTile(Tile t) {
+		Hand.Remove (t);
 	}
 
-    public Direction GetAdjacentDirection(Tile t)
+	public bool IsOnDirection(Direction r)
     {
-        return Direction.NONE;
+		return DirectionUtils.DirectionMatch (r, PositionOnTile);
     }
-	public static Vector2 Tests() {
-		int numPassed = 0;
-		int totalTests = 0;
+	public void MoveToPosition(Tile t, int position) {
+		Tile = t;
+		PositionOnTile = position;
+	}
 
-		return new Vector2 ( numPassed, totalTests );
+	public void EliminatePiece() {
+		Tile.RemovePiece (this);
+	}
+	public int AdjacentPos() {
+		if (PositionOnTile % 2 == 0)
+			return ( PositionOnTile + 5 )% 8;
+		return (PositionOnTile + 3) % 8;
+	}
 
+	public static void Tests() {
+		Debug.Log ("Running Tests in SPlayer");
+
+		List<Vector2Int> testPaths = new List<Vector2Int> ();
+		testPaths.Add (new Vector2Int (0, 5));
+		testPaths.Add (new Vector2Int (1, 3));
+		testPaths.Add (new Vector2Int (2, 6));
+		testPaths.Add (new Vector2Int (4, 7));
+		Tile t = new Tile (testPaths);
+
+		SPlayer p = new SPlayer ();
+		p.AddToHand (t);
+		Debug.Assert (p.IsInHand (t), "Basic Hand Tile addition");
+		p.PlayTile (t);
+		Debug.Assert (!p.IsInHand (t), "Basic Hand Tile Playing");
+
+		p.MoveToPosition (t, 7);
+		Debug.Assert (p.IsOnDirection (Direction.LEFT), "Detected Correct Direction");
 	}
 }
