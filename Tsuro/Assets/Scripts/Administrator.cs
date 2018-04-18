@@ -21,32 +21,22 @@ public class Administrator {
 
     bool HasLegalMoves (SPlayer sp, Board b)
     {
-       /* foreach (Spaces s in b.FreeSpaces)
+        foreach (Tile t in sp.Hand)
         {
-            foreach (Tile t in sp.Hand)
+            for (int i = 0; i < 4; i++)
             {
-                for (int i = 0; i < 4; i++)
-                {
-					t.SetRotation((Direction)i);
-                    if (!EliminatesActivePlayer(sp, b, t)) {
-                        return true;
-                    };
-                }
+				t.SetRotation((Direction)i);
+                if (!EliminatesActivePlayer(sp, b, t)) {
+                    return true;
+                };
             }
-        }*/
-   
+        }   
         return false;
     }
 
     bool EliminatesActivePlayer (SPlayer sp, Board b, Tile t)
-    {
-        TurnOutput to = PlayATurn(b.CurrentDeck, b.CurrentPlayersIn, b.CurrentPlayersOut, b, t);
-        if (to.PlayersOut.Contains(sp))
-        {
-            return true;
-        }
-
-        return false;
+	{
+		return b.MovePlayer (sp, t).Contains (sp);
     }
 
 
@@ -67,12 +57,15 @@ public class Administrator {
         return to;
     }
 
-	public static Vector2 Tests() {
-		int numPassed = 0;
-		int totalTests = 0;
-
-		return new Vector2 ( numPassed, totalTests );
-
+	public static void Tests() {
+		Administrator a = new Administrator ();
+		Board b = new Board (new Vector2Int(6,6));
+		SPlayer p1 = new SPlayer ();
+		SPlayer p2 = new SPlayer ();
+		b.AddNewPlayer (p1, new Vector2Int (0, 0), 7);
+		b.AddNewPlayer (p1, new Vector2Int (0, 0), 6);
+		//Debug.Assert (a.EliminatesActivePlayer (p1, b, p1.Hand [0]), "Player remains on board");
+		//Debug.Assert (a.HasLegalMoves (p1, b));
 	}
 }
 

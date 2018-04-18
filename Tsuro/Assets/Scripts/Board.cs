@@ -9,6 +9,7 @@ public class Board {
     public List<Tile> CurrentDeck;
 	private Vector2Int m_boardSize;
 	private Dictionary<Vector2Int,Tile> m_placedTiles;
+	public SPlayer DragonTilePlayer;
 
 	public Board (Vector2Int size) {
 		m_boardSize = size;
@@ -16,18 +17,41 @@ public class Board {
 		CurrentPlayersIn = new List<SPlayer>();
 		CurrentPlayersOut = new List<SPlayer> ();
 		CurrentDeck = new List<Tile> ();
-	}
+		//TEMPORARY, Create random same tiles
+		List<Vector2Int> testPaths = new List<Vector2Int> ();
+		testPaths.Add (new Vector2Int (0, 4));
+		testPaths.Add (new Vector2Int (1, 5));
+		testPaths.Add (new Vector2Int (2, 6));
+		testPaths.Add (new Vector2Int (3, 7));
 
+		for (int i = 0; i < 35; i++) {
+			Tile t = new Tile (testPaths);
+			CurrentDeck.Add (t);
+		}
+	}
+		
 	public bool AddNewPlayer(SPlayer sp, Vector2Int coord, int positionOnTile) {
 		if (isEdgePosition(coord,positionOnTile) &&
 			GetCollisionPlayer (sp , coord, positionOnTile) == null) {
 			CurrentPlayersIn.Add(sp);
 			sp.MoveToPosition(coord,positionOnTile);
+			for (int i = 0; i < 3; i ++ ){ 
+				DrawCard (sp);
+			}
 			return true;
 		}
 		return false;
 	}
-
+	
+	public void DrawCard(SPlayer sp) {
+		if (CurrentDeck.Count > 0) {
+			Tile t = CurrentDeck [0];
+			sp.AddToHand (t);
+			CurrentDeck.Remove (t);
+		} else if (DragonTilePlayer == null) {
+			DragonTilePlayer = sp;
+		}
+	}
 	public void AdvanceTurns(List<SPlayer> PlayersIn)
 	{
 		PlayersIn.Remove(PlayersIn[0]);
@@ -36,8 +60,12 @@ public class Board {
 
 	public void RemovePlayer(SPlayer p)
 	{
-		CurrentPlayersIn.Add(p);
-		CurrentPlayersOut.Remove(p);
+		CurrentPlayersOut.Add(p);
+		int i = CurrentPlayersIn.IndexOf (p);
+		if (DragonTilePlayer == p) {
+			DragonTilePlayer = CurrentPlayersIn [(i + 1) % CurrentPlayersIn.Count];
+		}
+		CurrentPlayersIn.Remove(p);
 	}
 
 
@@ -53,8 +81,9 @@ public class Board {
 		return true;
     }
 
-    public void MovePlayer(SPlayer sp, Tile t)
+	public List<SPlayer> MovePlayer(SPlayer sp, Tile t)
     {
+		List<SPlayer> playersEliminated = new List<SPlayer> ();
 		if (sp.Coordinate == t.Coordinate) {
 			int movedPosition = t.GetPathConnection (sp.PositionOnTile);
 			Vector2Int newCoord = sp.Coordinate + DirectionUtils.DirectionToVector(DirectionUtils.IntToDirection(movedPosition));
@@ -62,17 +91,18 @@ public class Board {
 			sp.MoveToPosition ( newCoord, newPos);
 			SPlayer colP = GetCollisionPlayer (sp, newCoord, newPos);
 			if (colP != null) {
-				RemovePlayer (sp);
-				RemovePlayer (colP);
+				playersEliminated.Add (sp);
+				playersEliminated.Add (colP);
 			}
 
 			if (!isPositionInBoard (newCoord)) {
-				RemovePlayer (sp);
-				return;
+				playersEliminated.Add (sp);
+				return playersEliminated;
 			}
 			if (m_placedTiles.ContainsKey (newCoord))
 				MovePlayer (sp, m_placedTiles [newCoord]);
 		}
+		return playersEliminated;
     }
 
 	private SPlayer GetCollisionPlayer(SPlayer sp, Vector2Int coord, int pos) {
@@ -125,6 +155,7 @@ public class Board {
 		Debug.Log ("Running Tests in Board");
 		Board b = new Board (new Vector2Int(6,6));
 
+		Debug.Assert (b.CurrentDeck.Count == 35, "Correct number of tiles in deck");
 		Debug.Assert (b.isPositionInBoard (new Vector2Int (0, 0)), "Position in board");
 		Debug.Assert (!b.isPositionInBoard (new Vector2Int (-4, 0)), "Position not in board");
 		Debug.Assert (!b.isPositionInBoard (new Vector2Int (0, 9)), "Position not in board");
@@ -139,10 +170,10 @@ public class Board {
 		Debug.Assert (b.PlaceTile (t, new Vector2Int (0, 4), Direction.UP), "On board placement");
 
 		List<Vector2Int> testPaths2 = new List<Vector2Int> ();
-		testPaths.Add (new Vector2Int (0, 4));
-		testPaths.Add (new Vector2Int (1, 5));
-		testPaths.Add (new Vector2Int (2, 6));
-		testPaths.Add (new Vector2Int (3, 7));
+		testPaths2.Add (new Vector2Int (0, 4));
+		testPaths2.Add (new Vector2Int (1, 5));
+		testPaths2.Add (new Vector2Int (2, 6));
+		testPaths2.Add (new Vector2Int (3, 7));
 		Tile t2 = new Tile (testPaths2);
 
 		Debug.Assert (!b.PlaceTile (t2, new Vector2Int (0, 6), Direction.DOWN), "Off board placement");
@@ -150,21 +181,22 @@ public class Board {
 		b.PlaceTile (t2,new Vector2Int(0,5), Direction.DOWN);
 
 		List<Vector2Int> testPaths3 = new List<Vector2Int> ();
-		testPaths.Add (new Vector2Int (0, 1));
-		testPaths.Add (new Vector2Int (2, 3));
-		testPaths.Add (new Vector2Int (4, 5));
-		testPaths.Add (new Vector2Int (6, 7));
+		testPaths3.Add (new Vector2Int (0, 1));
+		testPaths3.Add (new Vector2Int (2, 3));
+		testPaths3.Add (new Vector2Int (4, 5));
+		testPaths3.Add (new Vector2Int (6, 7));
 		Tile t3 = new Tile (testPaths3);
 
 		b.PlaceTile (t3, new Vector2Int (1, 4), Direction.UP);
 
 		SPlayer sp = new SPlayer ();
 
-
-
 		Debug.Assert (!b.isEdgePosition( new Vector2Int(4,4),0), "invalid edge position");
 		Debug.Assert (!b.AddNewPlayer (sp, new Vector2Int(0,4),0), "invalid player addition");
 		Debug.Assert (b.AddNewPlayer (sp, new Vector2Int(0,4),7), "valid player addition");
+
+		Debug.Assert (b.CurrentDeck.Count == 32, "Correct number of tiles given to player");
+		Debug.Assert (sp.Hand.Count == 3, "Correct number of tiles in player hand");
 
 		SPlayer sp2 = new SPlayer ();
 		Debug.Assert (b.GetCollisionPlayer (sp2, new Vector2Int (0, 4), 7) == sp, "Detected potential collision");
