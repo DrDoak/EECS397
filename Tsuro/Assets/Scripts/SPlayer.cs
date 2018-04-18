@@ -29,10 +29,15 @@ public class SPlayer {
 		Hand.Remove (t);
 	}
 
-	public bool IsOnDirection(Direction r)
+	public bool IsAtPosition(Vector2Int coord, Direction d)
     {
-		return DirectionUtils.DirectionMatch (r, PositionOnTile);
+		return (Coordinate == coord && DirectionUtils.DirectionMatch (d, PositionOnTile));
     }
+
+	public bool IsAtPosition(Vector2Int coord, int pos)
+	{
+		return (Coordinate == coord && PositionOnTile == pos);
+	}
 	public void MoveToPosition(Vector2Int pos , int tilePos) {
 		Coordinate = pos;
 		PositionOnTile = tilePos;
@@ -40,11 +45,6 @@ public class SPlayer {
 
 	public void EliminatePiece() {
 		//Tile.RemovePiece (this);
-	}
-	public int AdjacentPos() {
-		if (PositionOnTile % 2 == 0)
-			return ( PositionOnTile + 5 )% 8;
-		return (PositionOnTile + 3) % 8;
 	}
 
 	public static void Tests() {
@@ -63,7 +63,9 @@ public class SPlayer {
 		p.PlayTile (t);
 		Debug.Assert (!p.IsInHand (t), "Basic Hand Tile Playing");
 
-		p.MoveToPosition (t.Coordinate, 7);
-		Debug.Assert (p.IsOnDirection (Direction.LEFT), "Detected Correct Direction");
+		p.MoveToPosition (new Vector2Int(2,3), 7);
+		Debug.Assert (p.IsAtPosition (new Vector2Int(2,3), Direction.LEFT), "Detected Correct Direction");
+		Debug.Assert (p.IsAtPosition (new Vector2Int(2,3), 7), "Detected Correct Position");
+
 	}
 }

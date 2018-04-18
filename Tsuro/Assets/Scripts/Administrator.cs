@@ -62,7 +62,7 @@ public class Administrator {
           //  b.AdvanceTurns(PlayersIn);
         }
         else {
-            b.RemovePlayer(PlayersIn, PlayersOut);
+            //b.RemovePlayer(PlayersIn, PlayersOut);
         }
         return to;
     }

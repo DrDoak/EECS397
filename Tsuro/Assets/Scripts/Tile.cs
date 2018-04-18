@@ -8,7 +8,6 @@ public class Tile {
 	private List<Vector2Int> m_pathsOriginal;
 	public Vector2Int Coordinate { get; private set; }
 	private Direction m_rotation;
-	public List<SPlayer> PlayersOnTile { get; private set; }
 
 	public Tile(List<Vector2Int> pathList) {
 		m_pathsOriginal = pathList;
@@ -37,27 +36,6 @@ public class Tile {
 				return v.x;
 		}
 		return -1;
-	}
-
-	public SPlayer GetBlockingPlayer(int endPoint) {
-		foreach (SPlayer p in PlayersOnTile) {
-			if (p.PositionOnTile == endPoint)
-				return p;
-		}
-		return null;
-	}
-
-	public void RemovePiece(SPlayer sp) {
-		PlayersOnTile.Remove (sp);
-	}
-	public List<SPlayer> GetAdjacentPlayers(Tile t) {
-		List<SPlayer> ls = new List<SPlayer> ();
-		Vector2Int diff = t.Coordinate - Coordinate;
-		foreach (SPlayer p in PlayersOnTile) {
-			if (p.IsOnDirection (DirectionUtils.VectorToDirection(diff)))
-				ls.Add (p);
-		}
-		return ls;
 	}
 
 	private Vector2Int getRotatedPath(Vector2Int path, Direction r) {

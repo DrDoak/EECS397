@@ -7,6 +7,12 @@ public enum Direction { UP, RIGHT, DOWN, LEFT , NONE}
 
 public static class DirectionUtils {
 
+	public static int AdjacentPos(int i) {
+		if (i % 2 == 0)
+			return ( i + 5 )% 8;
+		return (i + 3) % 8;
+	}
+
 	public static bool DirectionMatch(Direction r, int pos)
 	{
 		if (r == Direction.UP && (pos == 0 || pos == 1))
@@ -95,12 +101,14 @@ public static class DirectionUtils {
 		Debug.Assert (IntToDirection(14) == Direction.NONE, "Invalid direction found");
 
 		p.MoveToPosition (t.Coordinate, 7);
-		Debug.Assert (p.IsOnDirection (Direction.LEFT), "Detected Correct Direction");
+		Debug.Assert (p.IsAtPosition (t.Coordinate, Direction.LEFT), "Detected Correct Direction");
 
 		Debug.Assert (DirectionToVector(Direction.LEFT) == new Vector2Int(-1,0), "Direction to Vector");
 		Debug.Assert (DirectionToVector(Direction.NONE) == new Vector2Int(0,0), "Invalid direction found");
 
 		Debug.Assert (VectorToDirection(new Vector2Int(-1,0)) == Direction.LEFT , "Vector to Direction");
 		Debug.Assert (VectorToDirection(new Vector2Int(0,0)) == Direction.NONE , "Invalid vector found");
+
+		Debug.Assert (AdjacentPos (7) == 2, "Correct adjacent position");
 	}
 }

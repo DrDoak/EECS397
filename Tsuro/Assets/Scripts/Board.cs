@@ -18,31 +18,15 @@ public class Board {
 		CurrentDeck = new List<Tile> ();
 	}
 
-	public bool PlaceTile(Tile t, Vector2Int position, Direction rotation)
-    {
-		if (!isPositionInBoard (position))
-			return false;
-		m_placedTiles [position] = t;
-		t.PlaceTile (position, rotation);
-		return true;
-    }
-
-	public bool AddNewPlayer(SPlayer sp, Vector2Int position, int positionOnTile) {
-		if (isEdgePosition(position,positionOnTile)) {
+	public bool AddNewPlayer(SPlayer sp, Vector2Int coord, int positionOnTile) {
+		if (isEdgePosition(coord,positionOnTile) &&
+			GetCollisionPlayer (sp , coord, positionOnTile) == null) {
 			CurrentPlayersIn.Add(sp);
-			sp.MoveToPosition(position,positionOnTile);
+			sp.MoveToPosition(coord,positionOnTile);
 			return true;
 		}
 		return false;
 	}
-
-	/*public List<Tile> Draw(List<Tile> DrawPile, SPlayer sp)
-	{
-		sp.AddToHand(DrawPile[0]);
-		//DrawPile.Remove(DrawPile[0]);
-
-		//return DrawPile;
-	}*/
 
 	public void AdvanceTurns(List<SPlayer> PlayersIn)
 	{
@@ -50,52 +34,53 @@ public class Board {
 		PlayersIn.Add(PlayersIn[0]);
 	}
 
-	public void RemovePlayer(List<SPlayer> PlayersIn, List<SPlayer> PlayersOut)
+	public void RemovePlayer(SPlayer p)
 	{
-		PlayersOut.Add(PlayersIn[0]);
-		PlayersIn.Remove(PlayersIn[0]);
+		CurrentPlayersIn.Add(p);
+		CurrentPlayersOut.Remove(p);
 	}
 
-    public List<SPlayer> MovePieces( Tile t)
+
+	public bool PlaceTile(Tile t, Vector2Int position, Direction rotation)
     {
-        List<SPlayer> Adjacents = new List<SPlayer>();
-        foreach (SPlayer sp in CurrentPlayersIn)
-        {
-            //Direction d = sp.GetAdjacentDirection(t);
-            /*if (d != Direction.NONE)
-            {
-                MovePlayer(sp,t);
-            }*/
-        }
-        return Adjacents;
-    }
-   	
-    public bool MovePlayer(SPlayer sp, Tile t)
-    {
-		int adjPos = sp.AdjacentPos ();
-		SPlayer collidedPlayer = t.GetBlockingPlayer (adjPos);
-		if (collidedPlayer != null)
+		if (!isPositionInBoard (position))
 			return false;
-		int endPos = t.GetPathConnection (adjPos);
-		if (t.GetBlockingPlayer (endPos) == null) {
-			sp.MoveToPosition (t.Coordinate,endPos);
-			Tile next = GetAdjacentTile (t, DirectionUtils.IntToDirection (endPos));
-			if (next == null)
-				return !isPositionInBoard (t.Coordinate);
-			MovePlayer (sp, next);
-		} else {
-			return false;
-		}
-		return false;
+		m_placedTiles [position] = t;
+		t.PlaceTile (position, rotation);
+		List<SPlayer> adjacentPlayers = GetAdjacentPlayers (t);
+		foreach (SPlayer sp in adjacentPlayers)
+			MovePlayer (sp, t);
+		return true;
     }
 
-	private void MoveAdjacentPlayers(Tile placedTile) {
-		foreach (SPlayer p in CurrentPlayersIn) {
-			Direction d = DirectionUtils.VectorToDirection (placedTile.Coordinate - p.Coordinate);
-			if (d != Direction.NONE && p.IsOnDirection(d)) {
-				MovePlayer (p, placedTile);
+    public void MovePlayer(SPlayer sp, Tile t)
+    {
+		if (sp.Coordinate == t.Coordinate) {
+			int movedPosition = t.GetPathConnection (sp.PositionOnTile);
+			Vector2Int newCoord = sp.Coordinate + DirectionUtils.DirectionToVector(DirectionUtils.IntToDirection(movedPosition));
+			int newPos = DirectionUtils.AdjacentPos (movedPosition);
+			sp.MoveToPosition ( newCoord, newPos);
+			SPlayer colP = GetCollisionPlayer (sp, newCoord, newPos);
+			if (colP != null) {
+				RemovePlayer (sp);
+				RemovePlayer (colP);
 			}
+
+			if (!isPositionInBoard (newCoord)) {
+				RemovePlayer (sp);
+				return;
+			}
+			if (m_placedTiles.ContainsKey (newCoord))
+				MovePlayer (sp, m_placedTiles [newCoord]);
 		}
+    }
+
+	private SPlayer GetCollisionPlayer(SPlayer sp, Vector2Int coord, int pos) {
+		foreach (SPlayer p in CurrentPlayersIn) {
+			if (p != sp && p.IsAtPosition (coord, pos))
+				return p;
+		}
+		return null;
 	}
 
 	private Direction DirectionToTile(Tile fromTile, Tile toTile) {
@@ -111,32 +96,17 @@ public class Board {
 		return Direction.NONE;
 	}
 
-	private List<SPlayer> GetAdjacentPlayers(Tile originTile) {
-		List<SPlayer> lp = new List<SPlayer> ();
-		int dir = 0;
-		foreach (Tile adjacentTile in GetAllAdjacentTiles(originTile)) {
-			lp.AddRange(adjacentTile.GetAdjacentPlayers (originTile));
+	private List<SPlayer> GetAdjacentPlayers(Tile placedTile) {
+		List<SPlayer> pList = new List<SPlayer> ();
+		foreach (SPlayer p in CurrentPlayersIn) {
+			Vector2Int diff = p.Coordinate - placedTile.Coordinate;
+			Direction d = DirectionUtils.VectorToDirection (diff);
+			if (p.Coordinate == placedTile.Coordinate ||
+				d != Direction.NONE && p.IsAtPosition(placedTile.Coordinate + diff, DirectionUtils.InvertDirection(d))) {
+				pList.Add (p);
+			}
 		}
-		return lp;
-	}
-
-	private List<Tile> GetAllAdjacentTiles(Tile t) {
-		List<Tile> l = new List<Tile> ();
-		for (int i = 0; i < 4; i++) {
-			Tile at = GetAdjacentTile (t, (Direction)i);
-			if (at != null)
-				l.Add (at);
-		}
-		return l;
-	}
-
-	private Tile GetAdjacentTile(Tile t, Direction d) {
-		Vector2Int c = t.Coordinate +  DirectionUtils.DirectionToVector (d);
-		if (!isPositionInBoard (c))
-			return null;
-		if (m_placedTiles.ContainsKey (c))
-			return m_placedTiles [c];
-		return null;
+		return pList;
 	}
 
 	private bool isPositionInBoard (Vector2Int pos) {
@@ -166,7 +136,7 @@ public class Board {
 		testPaths.Add (new Vector2Int (4, 7));
 		Tile t = new Tile (testPaths);
 
-		Debug.Assert (b.PlaceTile (t, new Vector2Int (0, 4), Direction.DOWN), "On board placement");
+		Debug.Assert (b.PlaceTile (t, new Vector2Int (0, 4), Direction.UP), "On board placement");
 
 		List<Vector2Int> testPaths2 = new List<Vector2Int> ();
 		testPaths.Add (new Vector2Int (0, 4));
@@ -179,11 +149,6 @@ public class Board {
 
 		b.PlaceTile (t2,new Vector2Int(0,5), Direction.DOWN);
 
-		Debug.Assert (b.GetAdjacentTile (t,Direction.LEFT) == null, "AdjacentTile None");
-		Debug.Assert (b.GetAdjacentTile (t,Direction.UP) == t2, "Found Adjacent Tile");
-		Debug.Assert (b.GetAdjacentTile (t2,Direction.UP) == null, "Detected off board");
-		Debug.Assert (b.GetAdjacentTile (t2,Direction.LEFT) == null, "Detected off board");
-
 		List<Vector2Int> testPaths3 = new List<Vector2Int> ();
 		testPaths.Add (new Vector2Int (0, 1));
 		testPaths.Add (new Vector2Int (2, 3));
@@ -191,14 +156,26 @@ public class Board {
 		testPaths.Add (new Vector2Int (6, 7));
 		Tile t3 = new Tile (testPaths3);
 
-		b.PlaceTile (t3, new Vector2Int (1, 4), Direction.DOWN);
-
-		Debug.Assert (b.GetAllAdjacentTiles (t).Count == 2, "Found both adjacaent tiles");
+		b.PlaceTile (t3, new Vector2Int (1, 4), Direction.UP);
 
 		SPlayer sp = new SPlayer ();
+
+
 
 		Debug.Assert (!b.isEdgePosition( new Vector2Int(4,4),0), "invalid edge position");
 		Debug.Assert (!b.AddNewPlayer (sp, new Vector2Int(0,4),0), "invalid player addition");
 		Debug.Assert (b.AddNewPlayer (sp, new Vector2Int(0,4),7), "valid player addition");
+
+		SPlayer sp2 = new SPlayer ();
+		Debug.Assert (b.GetCollisionPlayer (sp2, new Vector2Int (0, 4), 7) == sp, "Detected potential collision");
+		Debug.Assert (!b.AddNewPlayer (sp2, new Vector2Int (0, 4), 7), "Not insert player due to collision");
+			
+		Debug.Assert (b.GetAdjacentPlayers (t3).Count == 0, "Did not incorrectly grab a player");
+		Debug.Assert (b.GetAdjacentPlayers (t).Count == 1, "Found adjacent player");
+
+		b.MovePlayer (sp, t);
+
+		Debug.Assert ( sp.Coordinate == new Vector2Int(0,3), "Moved player to correct coordinate");
+		Debug.Assert ( sp.PositionOnTile == 1, "Moved player to correct position");
 	}
 }
