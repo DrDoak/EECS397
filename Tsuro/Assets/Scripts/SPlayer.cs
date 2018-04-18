@@ -14,6 +14,14 @@ public class SPlayer {
 		Hand = new List<Tile> ();
 	}
 
+	/*public SPlayer DeepCopy() {
+		SPlayer p = new SPlayer ();
+		foreach (Tile t in Hand) {
+		}
+		p.
+		return p
+	} */
+
     public void AddToHand(Tile t)
     {
         Hand.Add(t);
@@ -25,8 +33,9 @@ public class SPlayer {
         { return true; }
         else { return false; }
     }
-	public void PlayTile(Tile t) {
+	public Tile PlayTile(Tile t) {
 		Hand.Remove (t);
+		return t;
 	}
 
 	public bool IsAtPosition(Vector2Int coord, Direction d)
