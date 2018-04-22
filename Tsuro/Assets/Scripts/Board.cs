@@ -6,36 +6,19 @@ public class Board {
 
     public List<SPlayer> CurrentPlayersIn;
     public List<SPlayer> CurrentPlayersOut;
-    public List<Tile> CurrentDeck;
 	private Vector2Int m_boardSize;
 	private Dictionary<Vector2Int,Tile> m_placedTiles;
-	public SPlayer DragonTilePlayer;
+    public Deck CurrentDeck;
 
 	public Board (Vector2Int size) {
 		m_boardSize = size;
 		m_placedTiles = new Dictionary<Vector2Int,Tile> ();
 		CurrentPlayersIn = new List<SPlayer>();
 		CurrentPlayersOut = new List<SPlayer> ();
-		CurrentDeck = new List<Tile> ();
-		//TEMPORARY, Create random same tiles
-		List<Vector2Int> testPaths = new List<Vector2Int> ();
-		testPaths.Add (new Vector2Int (0, 4));
-		testPaths.Add (new Vector2Int (1, 5));
-		testPaths.Add (new Vector2Int (2, 6));
-		testPaths.Add (new Vector2Int (3, 7));
-
-		for (int i = 0; i < 35; i++) {
-			Tile t = new Tile (testPaths);
-			CurrentDeck.Add (t);
-		}
+		CurrentDeck = new Deck();
 	}
 
-	/*public Board DeepCopy() {
-		Board b = new Board (m_boardSize);
-		foreach (SPlayer sp in CurrentPlayersIn) {
-			b.CurrentPlayersIn.Add( 
-		}
-	}*/
+	
 
 	public bool AddNewPlayer(SPlayer sp, Vector2Int coord, int positionOnTile) {
 		if (isEdgePosition(coord,positionOnTile) &&
@@ -43,22 +26,14 @@ public class Board {
 			CurrentPlayersIn.Add(sp);
 			sp.MoveToPosition(coord,positionOnTile);
 			for (int i = 0; i < 3; i ++ ){ 
-				DrawCard (sp);
+				CurrentDeck.DrawCard (sp.MyHand);
 			}
 			return true;
 		}
 		return false;
 	}
 	
-	public void DrawCard(SPlayer sp) {
-		if (CurrentDeck.Count > 0) {
-			Tile t = CurrentDeck [0];
-			sp.AddToHand (t);
-			CurrentDeck.Remove (t);
-		} else if (DragonTilePlayer == null) {
-			DragonTilePlayer = sp;
-		}
-	}
+	
 	public void AdvanceTurns(List<SPlayer> PlayersIn)
 	{
 		PlayersIn.Remove(PlayersIn[0]);
@@ -69,8 +44,8 @@ public class Board {
 	{
 		CurrentPlayersOut.Add(p);
 		int i = CurrentPlayersIn.IndexOf (p);
-		if (DragonTilePlayer == p) {
-			DragonTilePlayer = CurrentPlayersIn [(i + 1) % CurrentPlayersIn.Count];
+		if (CurrentDeck.DragonTilePlayer == p) {
+			CurrentDeck.DragonTilePlayer = CurrentPlayersIn [(i + 1) % CurrentPlayersIn.Count];
 		}
 		CurrentPlayersIn.Remove(p);
 	}
@@ -82,9 +57,7 @@ public class Board {
 			return null;
 		m_placedTiles [position] = t;
 		t.PlaceTile (position, rotation);
-		/*List<SPlayer> adjacentPlayers = GetAdjacentPlayers (t);
-		foreach (SPlayer sp in adjacentPlayers)
-			MovePlayer (sp, t);*/
+		
 		return t;
     }
 
@@ -161,7 +134,7 @@ public class Board {
 			Vector2Int diff = p.Coordinate - placedTile.Coordinate;
 			Direction d = DirectionUtils.VectorToDirection (diff);
 			if (p.Coordinate == placedTile.Coordinate ||
-				d != Direction.NONE && p.IsAtPosition(placedTile.Coordinate + diff, DirectionUtils.InvertDirection(d))) {
+				d != Direction.NONE && p.IsOnEdge(placedTile.Coordinate + diff, DirectionUtils.InvertDirection(d))) {
 				pList.Add (p);
 			}
 		}
@@ -184,7 +157,6 @@ public class Board {
 		Debug.Log ("Running Tests in Board");
 		Board b = new Board (new Vector2Int(6,6));
 
-		Debug.Assert (b.CurrentDeck.Count == 35, "Correct number of tiles in deck");
 		Debug.Assert (b.isPositionInBoard (new Vector2Int (0, 0)), "Position in board");
 		Debug.Assert (!b.isPositionInBoard (new Vector2Int (-4, 0)), "Position not in board");
 		Debug.Assert (!b.isPositionInBoard (new Vector2Int (0, 9)), "Position not in board");
@@ -224,9 +196,7 @@ public class Board {
 		Debug.Assert (!b.AddNewPlayer (sp, new Vector2Int(0,4),0), "invalid player addition");
 		Debug.Assert (b.AddNewPlayer (sp, new Vector2Int(0,4),7), "valid player addition");
 
-		Debug.Assert (b.CurrentDeck.Count == 32, "Correct number of tiles given to player");
-		Debug.Assert (sp.Hand.Count == 3, "Correct number of tiles in player hand");
-
+		
 		SPlayer sp2 = new SPlayer ();
 		Debug.Assert (b.GetCollisionPlayer (sp2, new Vector2Int (0, 4), 7) == sp, "Detected potential collision");
 		Debug.Assert (!b.AddNewPlayer (sp2, new Vector2Int (0, 4), 7), "Not insert player due to collision");

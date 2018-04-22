@@ -4,46 +4,29 @@ using UnityEngine;
 
 public class SPlayer {
 
-    public List<Tile> Hand { get; private set; }
+    public Hand MyHand { get; private set; }
     public int PositionOnTile { get; private set; }
 
 	private Color m_color;
 	public Vector2Int Coordinate;
 
 	public SPlayer() {
-		Hand = new List<Tile> ();
+		MyHand = new Hand ();
 	}
 
-	/*public SPlayer DeepCopy() {
-		SPlayer p = new SPlayer ();
-		foreach (Tile t in Hand) {
-		}
-		p.
-		return p
-	} */
-
-    public void AddToHand(Tile t)
-    {
-        Hand.Add(t);
-    }
-
-    public bool IsInHand (Tile t)
-    {
-        if (Hand.Contains(t))
-        { return true; }
-        else { return false; }
-    }
+	
+    
 	public Tile PlayTile(Tile t) {
-		Hand.Remove (t);
+		MyHand.RemoveFromHand (t);
 		return t;
 	}
 
-	public bool IsAtPosition(Vector2Int coord, Direction d)
+	public bool IsOnEdge (Vector2Int coord, Direction d)
     {
 		return (Coordinate == coord && DirectionUtils.DirectionMatch (d, PositionOnTile));
     }
 
-	public bool IsAtPosition(Vector2Int coord, int pos)
+	public bool IsAtPosition (Vector2Int coord, int pos)
 	{
 		return (Coordinate == coord && PositionOnTile == pos);
 	}
@@ -52,9 +35,6 @@ public class SPlayer {
 		PositionOnTile = tilePos;
 	}
 
-	public void EliminatePiece() {
-		//Tile.RemovePiece (this);
-	}
 
 	public static void Tests() {
 		Debug.Log ("Running Tests in SPlayer");
@@ -67,13 +47,13 @@ public class SPlayer {
 		Tile t = new Tile (testPaths);
 
 		SPlayer p = new SPlayer ();
-		p.AddToHand (t);
-		Debug.Assert (p.IsInHand (t), "Basic Hand Tile addition");
+		p.MyHand.AddToHand (t);
+		Debug.Assert (p.MyHand.IsInHand (t), "Basic Hand Tile addition");
 		p.PlayTile (t);
-		Debug.Assert (!p.IsInHand (t), "Basic Hand Tile Playing");
+		Debug.Assert (!p.MyHand.IsInHand (t), "Basic Hand Tile Playing");
 
 		p.MoveToPosition (new Vector2Int(2,3), 7);
-		Debug.Assert (p.IsAtPosition (new Vector2Int(2,3), Direction.LEFT), "Detected Correct Direction");
+		Debug.Assert (p.IsOnEdge (new Vector2Int(2,3), Direction.LEFT), "Detected Correct Direction");
 		Debug.Assert (p.IsAtPosition (new Vector2Int(2,3), 7), "Detected Correct Position");
 
 	}

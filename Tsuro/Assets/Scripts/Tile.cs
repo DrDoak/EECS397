@@ -5,7 +5,7 @@ using UnityEngine;
 public class Tile {
 
 	private List<Vector2Int> m_paths;
-	private List<Vector2Int> m_pathsOriginal;
+	private readonly List<Vector2Int> m_pathsOriginal;
 	public Vector2Int Coordinate { get; private set; }
 	private Direction m_rotation;
 

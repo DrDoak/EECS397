@@ -90,7 +90,7 @@ public static class DirectionUtils {
 		Tile t = new Tile (testPaths);
 
 		SPlayer p = new SPlayer ();
-		p.AddToHand (t);
+		p.MyHand.AddToHand (t);
 		Debug.Assert ( DirectionMatch(Direction.RIGHT,3), "Direction Match");
 		Debug.Assert ( !DirectionMatch(Direction.RIGHT,0), "Direction mismatch found");
 		Debug.Assert ( !DirectionMatch(Direction.DOWN,9), "Not match for invalid positions");
@@ -101,7 +101,7 @@ public static class DirectionUtils {
 		Debug.Assert (IntToDirection(14) == Direction.NONE, "Invalid direction found");
 
 		p.MoveToPosition (t.Coordinate, 7);
-		Debug.Assert (p.IsAtPosition (t.Coordinate, Direction.LEFT), "Detected Correct Direction");
+		Debug.Assert (p.IsOnEdge (t.Coordinate, Direction.LEFT), "Detected Correct Direction");
 
 		Debug.Assert (DirectionToVector(Direction.LEFT) == new Vector2Int(-1,0), "Direction to Vector");
 		Debug.Assert (DirectionToVector(Direction.NONE) == new Vector2Int(0,0), "Invalid direction found");
