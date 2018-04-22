@@ -8,7 +8,7 @@ public class Board {
     public List<SPlayer> CurrentPlayersOut;
 	private Vector2Int m_boardSize;
 	private Dictionary<Vector2Int,Tile> m_placedTiles;
-    public Deck CurrentDeck;
+    public readonly Deck CurrentDeck;
 
 	public Board (Vector2Int size) {
 		m_boardSize = size;
@@ -44,8 +44,8 @@ public class Board {
 	{
 		CurrentPlayersOut.Add(p);
 		int i = CurrentPlayersIn.IndexOf (p);
-		if (CurrentDeck.DragonTilePlayer == p) {
-			CurrentDeck.DragonTilePlayer = CurrentPlayersIn [(i + 1) % CurrentPlayersIn.Count];
+		if (CurrentDeck.DragonTileHand == p.MyHand) {
+			CurrentDeck.DragonTileHand = CurrentPlayersIn [(i + 1) % CurrentPlayersIn.Count].MyHand;
 		}
 		CurrentPlayersIn.Remove(p);
 	}
@@ -87,18 +87,24 @@ public class Board {
 
 	public bool IsPlayerEliminated(SPlayer sp, Vector2Int startCoord, int startPos , Tile t)
 	{
+        Debug.Log("Starting coordinate: " + startCoord + " tile coord " + t.Coordinate);
+        Debug.Log("Tile is: " + t.ToString());
 		if (t == null)
 			return false;
 		if (startCoord == t.Coordinate) {
 			int movedPosition = t.GetPathConnection (startPos);
+            
 			Vector2Int newCoord = startCoord + DirectionUtils.DirectionToVector(DirectionUtils.IntToDirection(movedPosition));
 			int newPos = DirectionUtils.AdjacentPos (movedPosition);
-			SPlayer colP = GetCollisionPlayer (sp, newCoord, newPos);
+            Debug.Log("MOving position from" + startPos + " to: " + movedPosition + "new coord is: " + newCoord);
+            SPlayer colP = GetCollisionPlayer (sp, newCoord, newPos);
 			if (colP != null) {
+                Debug.Log("Player eliminated due to collision");
 				return true;
 			}
 
 			if (!isPositionInBoard (newCoord)) {
+                Debug.Log("Player eliminated due to being at position: " + newCoord);
 				return true;
 			}
 			if (m_placedTiles.ContainsKey (newCoord))

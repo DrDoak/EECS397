@@ -13,11 +13,12 @@ public class Main : MonoBehaviour {
 	}
 
 	void RunTests() {
-		Vector2 testResults = new Vector2 ();
+        Deck.Tests();
+        //Vector2 testResults = new Vector2 ();
 		Tile.Tests ();
-		SPlayer.Tests ();
-		DirectionUtils.Tests ();
-		Board.Tests ();
+		//SPlayer.Tests ();
+		//DirectionUtils.Tests ();
+		//Board.Tests ();
 		Administrator.Tests ();
 
 	}

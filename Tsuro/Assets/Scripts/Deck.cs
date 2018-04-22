@@ -80,6 +80,53 @@ public class Deck
         }
     }
 
+    public static void Tests()
+    {
+        Debug.Log("Running Tests in Deck");
+
+        Board b = new Board(new Vector2Int(6, 6));
+        SPlayer p1 = new SPlayer();
+        SPlayer p2 = new SPlayer();
+        Deck d = b.CurrentDeck;
+        Deck fullDeck = new Deck();
+        Debug.Assert(b.CurrentDeck.DrawDeck.Count == 35);
+
+        b.AddNewPlayer(p1, new Vector2Int(0, 0), 7);
+        b.AddNewPlayer(p2, new Vector2Int(0, 0), 6);
+
+        Debug.Assert(b.CurrentDeck.DrawDeck.Count == 29);
+
+        Debug.Assert(p2.MyHand.Pieces[0].IsEqual(fullDeck.DrawDeck[3]));
+        Debug.Assert(p1.MyHand.Pieces[2].IsEqual(fullDeck.DrawDeck[2]));
+        
+
+        //List<Vector2Int> testPaths = new List<Vector2Int>();
+        //testPaths.Add(new Vector2Int(0, 4));
+        //testPaths.Add(new Vector2Int(1, 3));
+        //testPaths.Add(new Vector2Int(2, 6));
+        //testPaths.Add(new Vector2Int(5, 7));
+        //Tile t = new Tile(testPaths);
+
+        //Debug.Assert(!a.LegalPlay(p1, b, p1.MyHand.Pieces[0]), "Determines that the play is illegal for eliminating player");
+        //Debug.Assert(!a.LegalPlay(p1, b, p1.MyHand.Pieces[1]), "Determines that the play is illegal for eliminating player");
+        //Debug.Assert(a.LegalPlay(p1, b, p1.MyHand.Pieces[2]), "Determines that the play is legal");
+
+        //b.PlaceTile(t, new Vector2Int(0, 0), Direction.UP);
+        //Debug.Assert(a.IsEliminatePlayer(p1, b, t), "Detects when a move eliminates a player");
+        //Debug.Assert(p1.Coordinate == new Vector2Int(0, 0), "Elimination test did not actually move player");
+        //Debug.Assert(a.HasLegalMoves(p1, b), "Finds that player is able to place something");
+
+
+        //Debug.Assert(!a.LegalPlay(p1, b, t), "Determines that the play is illegal due to tile not being in hand");
+        //p1.MyHand.AddToHand(t);
+        //Debug.Assert(!a.LegalPlay(p1, b, t), "Determines that the play is illegal due to being eliminating");
+        //b.PlaceTile(t, new Vector2Int(0, 0), Direction.RIGHT);
+        //Debug.Assert(a.LegalPlay(p1, b, t), "Determines that the play is legal");
+        //Debug.Assert(p1.Coordinate == new Vector2Int(0, 0), "Determined that LegalPlay did not actually move player");
+
+        //Debug.Assert(a.PlayATurn(b.CurrentDeck.DrawDeck, b.CurrentPlayersIn, b.CurrentPlayersOut, b, t).ContinueGame, "Determines that a play did not end the game");
+    }
+
 }
 
 //Debug.Assert(b.CurrentDeck.Count == 35, "Correct number of tiles in deck");

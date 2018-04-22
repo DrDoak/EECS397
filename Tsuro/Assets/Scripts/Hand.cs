@@ -19,6 +19,10 @@ public class Hand {
 
     public bool IsInHand(Tile t)
     {
+        Debug.Log(Pieces.Count);
+
+        Debug.Log(Pieces.Contains(t));
+
         if (Pieces.Contains(t))
         { return true; }
         else { return false; }
@@ -26,6 +30,7 @@ public class Hand {
 
     public void RemoveFromHand (Tile t)
     {
+        Debug.Log("Calling RemoveFromHand");
         Pieces.Remove(t);
     }
     
