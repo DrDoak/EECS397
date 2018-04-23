@@ -5,6 +5,7 @@ using UnityEngine;
 public class Hand {
 
     public List<Tile> Pieces { get; private set; }
+	public int PlayerIndex = 0;
 
     public Hand()
     {
@@ -19,19 +20,15 @@ public class Hand {
 
     public bool IsInHand(Tile t)
     {
-        Debug.Log(Pieces.Count);
-
-        Debug.Log(Pieces.Contains(t));
-
         if (Pieces.Contains(t))
         { return true; }
         else { return false; }
     }
 
-    public void RemoveFromHand (Tile t)
+    public Tile RemoveFromHand (Tile t)
     {
-        Debug.Log("Calling RemoveFromHand");
         Pieces.Remove(t);
+		return t;
     }
     
 }

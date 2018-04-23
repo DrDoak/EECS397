@@ -7,6 +7,7 @@ public class SPlayer {
     public Hand MyHand { get; private set; }
     public int PositionOnTile { get; private set; }
 
+
 	private Color m_color;
 	public Vector2Int Coordinate;
 

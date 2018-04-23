@@ -46,7 +46,6 @@ public class Deck
 
     public Hand DragonTileHand;
 
-
     public List<Tile> DrawDeck { get; private set; }
 
     public Deck()
@@ -66,7 +65,7 @@ public class Deck
             DrawDeck.Add(new Tile(AllPaths));       
         }
     }
-    public void DrawCard(Hand h)
+	public void DrawCard(Hand h)
     {
         if (DrawDeck.Count > 0)
         {
@@ -79,7 +78,37 @@ public class Deck
             DragonTileHand = h;
         }
     }
+	public void OnPlayerRemove(Hand removedHand,List<SPlayer> OtherPlayersIn) {
+		//Hand goes back in the deck
+		foreach (Tile t in removedHand.Pieces) {
+			DrawDeck.Add (t);
+		}
+		if (DragonTileHand == removedHand) {
+			int index = (removedHand.PlayerIndex ) % OtherPlayersIn.Count;
+			DragonTileHand = OtherPlayersIn [index].MyHand;
+		}
+		if (DragonTileHand != null)
+			m_RefillHands (OtherPlayersIn, DragonTileHand.PlayerIndex);
 
+	}
+	void m_RefillHands(List<SPlayer> playersIn, int index) {
+		int numberWithThree = 0;
+		while (DrawDeck.Count > 0) {
+			if (DragonTileHand.Pieces.Count >= 3) {
+				numberWithThree++;
+				if (numberWithThree == (playersIn.Count))
+					break;
+				index = (index + 1) % playersIn.Count;
+				DragonTileHand = playersIn [index].MyHand;
+				continue;
+			}
+			DrawCard (DragonTileHand);
+			index = (index + 1) % playersIn.Count;
+			DragonTileHand = playersIn [index].MyHand;
+
+		}
+		DragonTileHand = null;
+	}
     public static void Tests()
     {
         Debug.Log("Running Tests in Deck");
@@ -87,7 +116,7 @@ public class Deck
         Board b = new Board(new Vector2Int(6, 6));
         SPlayer p1 = new SPlayer();
         SPlayer p2 = new SPlayer();
-        Deck d = b.CurrentDeck;
+
         Deck fullDeck = new Deck();
         Debug.Assert(b.CurrentDeck.DrawDeck.Count == 35);
 
@@ -99,34 +128,7 @@ public class Deck
         Debug.Assert(p2.MyHand.Pieces[0].IsEqual(fullDeck.DrawDeck[3]));
         Debug.Assert(p1.MyHand.Pieces[2].IsEqual(fullDeck.DrawDeck[2]));
         
-
-        //List<Vector2Int> testPaths = new List<Vector2Int>();
-        //testPaths.Add(new Vector2Int(0, 4));
-        //testPaths.Add(new Vector2Int(1, 3));
-        //testPaths.Add(new Vector2Int(2, 6));
-        //testPaths.Add(new Vector2Int(5, 7));
-        //Tile t = new Tile(testPaths);
-
-        //Debug.Assert(!a.LegalPlay(p1, b, p1.MyHand.Pieces[0]), "Determines that the play is illegal for eliminating player");
-        //Debug.Assert(!a.LegalPlay(p1, b, p1.MyHand.Pieces[1]), "Determines that the play is illegal for eliminating player");
-        //Debug.Assert(a.LegalPlay(p1, b, p1.MyHand.Pieces[2]), "Determines that the play is legal");
-
-        //b.PlaceTile(t, new Vector2Int(0, 0), Direction.UP);
-        //Debug.Assert(a.IsEliminatePlayer(p1, b, t), "Detects when a move eliminates a player");
-        //Debug.Assert(p1.Coordinate == new Vector2Int(0, 0), "Elimination test did not actually move player");
-        //Debug.Assert(a.HasLegalMoves(p1, b), "Finds that player is able to place something");
-
-
-        //Debug.Assert(!a.LegalPlay(p1, b, t), "Determines that the play is illegal due to tile not being in hand");
-        //p1.MyHand.AddToHand(t);
-        //Debug.Assert(!a.LegalPlay(p1, b, t), "Determines that the play is illegal due to being eliminating");
-        //b.PlaceTile(t, new Vector2Int(0, 0), Direction.RIGHT);
-        //Debug.Assert(a.LegalPlay(p1, b, t), "Determines that the play is legal");
-        //Debug.Assert(p1.Coordinate == new Vector2Int(0, 0), "Determined that LegalPlay did not actually move player");
-
-        //Debug.Assert(a.PlayATurn(b.CurrentDeck.DrawDeck, b.CurrentPlayersIn, b.CurrentPlayersOut, b, t).ContinueGame, "Determines that a play did not end the game");
     }
-
 }
 
 //Debug.Assert(b.CurrentDeck.Count == 35, "Correct number of tiles in deck");

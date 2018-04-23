@@ -23,6 +23,7 @@ public class Board {
 	public bool AddNewPlayer(SPlayer sp, Vector2Int coord, int positionOnTile) {
 		if (isEdgePosition(coord,positionOnTile) &&
 			GetCollisionPlayer (sp , coord, positionOnTile) == null) {
+			sp.MyHand.PlayerIndex = CurrentPlayersIn.Count;
 			CurrentPlayersIn.Add(sp);
 			sp.MoveToPosition(coord,positionOnTile);
 			for (int i = 0; i < 3; i ++ ){ 
@@ -43,21 +44,20 @@ public class Board {
 	public void RemovePlayer(SPlayer p)
 	{
 		CurrentPlayersOut.Add(p);
-		int i = CurrentPlayersIn.IndexOf (p);
-		if (CurrentDeck.DragonTileHand == p.MyHand) {
-			CurrentDeck.DragonTileHand = CurrentPlayersIn [(i + 1) % CurrentPlayersIn.Count].MyHand;
-		}
 		CurrentPlayersIn.Remove(p);
+		CurrentDeck.OnPlayerRemove (p.MyHand,CurrentPlayersIn);
+		for (int i = p.MyHand.PlayerIndex; i < CurrentPlayersIn.Count; i ++) {
+			CurrentPlayersIn[i].MyHand.PlayerIndex = i;
+		}
 	}
 
 
-	public Tile PlaceTile(Tile t, Vector2Int position, Direction rotation)
+	public Tile PlaceTile(Tile t, Vector2Int coordinate, Direction rotation)
     {
-		if (!isPositionInBoard (position))
+		if (!isPositionInBoard (coordinate))
 			return null;
-		m_placedTiles [position] = t;
-		t.PlaceTile (position, rotation);
-		
+		m_placedTiles [coordinate] = t;
+		t.SetCoordinateAndDirection (coordinate, rotation);
 		return t;
     }
 
@@ -80,15 +80,15 @@ public class Board {
 				return playersEliminated;
 			}
 			if (m_placedTiles.ContainsKey (newCoord))
-				MovePlayer (sp, m_placedTiles [newCoord]);
+				return MovePlayer (sp, m_placedTiles [newCoord]);
 		}
 		return playersEliminated;
     }
 
 	public bool IsPlayerEliminated(SPlayer sp, Vector2Int startCoord, int startPos , Tile t)
 	{
-        Debug.Log("Starting coordinate: " + startCoord + " tile coord " + t.Coordinate);
-        Debug.Log("Tile is: " + t.ToString());
+      //  Debug.Log("Starting coordinate: " + startCoord + " tile coord " + t.Coordinate);
+      //  Debug.Log("Tile is: " + t.ToString());
 		if (t == null)
 			return false;
 		if (startCoord == t.Coordinate) {
@@ -96,15 +96,15 @@ public class Board {
             
 			Vector2Int newCoord = startCoord + DirectionUtils.DirectionToVector(DirectionUtils.IntToDirection(movedPosition));
 			int newPos = DirectionUtils.AdjacentPos (movedPosition);
-            Debug.Log("MOving position from" + startPos + " to: " + movedPosition + "new coord is: " + newCoord);
+        //    Debug.Log("Moving position from" + startPos + " to: " + movedPosition + "new coord is: " + newCoord);
             SPlayer colP = GetCollisionPlayer (sp, newCoord, newPos);
 			if (colP != null) {
-                Debug.Log("Player eliminated due to collision");
+       //         Debug.Log("Player eliminated due to collision");
 				return true;
 			}
 
 			if (!isPositionInBoard (newCoord)) {
-                Debug.Log("Player eliminated due to being at position: " + newCoord);
+      //          Debug.Log("Player eliminated due to being at position: " + newCoord);
 				return true;
 			}
 			if (m_placedTiles.ContainsKey (newCoord))

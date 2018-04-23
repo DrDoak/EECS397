@@ -14,7 +14,7 @@ public class Tile {
 		m_rotation = Direction.UP;
 		m_paths = pathList;
 	}
-	public void PlaceTile(Vector2Int c, Direction r) {
+	public void SetCoordinateAndDirection(Vector2Int c, Direction r) {
 		Coordinate = c;
 		m_rotation = r;
 		SetRotation (r);
@@ -75,7 +75,7 @@ public class Tile {
 		Vector2Int p = new Vector2Int (0, 5);
 		Debug.Assert (t.getRotatedPath (p, Direction.DOWN).Equals(new Vector2Int(4,1)), "Path rotation");
 
-		t.PlaceTile (new Vector2Int (2, 3), Direction.LEFT);
+		t.SetCoordinateAndDirection (new Vector2Int (2, 3), Direction.LEFT);
 		Debug.Assert (t.m_paths[1].Equals(new Vector2Int(7,1)), "Place Tile rotation");
 		Debug.Assert (t.OriginalPaths[3].Equals(new Vector2Int(4,7)), "Original paths preserved");
 		Debug.Assert (t.GetPathConnection (7) == 1, "Sent valid path");
