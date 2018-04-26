@@ -50,6 +50,7 @@ public class Deck
     public List<Tile> DrawDeck { get; private set; }
 
 	private Dictionary<Hand,int> m_handIndex;
+
     public Deck()
     {
         DrawDeck = new List<Tile>();
