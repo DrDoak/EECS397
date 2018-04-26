@@ -5,7 +5,6 @@ using UnityEngine;
 public class Hand {
 
     public List<Tile> Pieces { get; private set; }
-	public int PlayerIndex = 0;
 
     public Hand()
     {

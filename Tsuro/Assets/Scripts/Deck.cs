@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class Deck
 {
     
@@ -48,9 +49,11 @@ public class Deck
 
     public List<Tile> DrawDeck { get; private set; }
 
+	private Dictionary<Hand,int> m_handIndex;
     public Deck()
     {
         DrawDeck = new List<Tile>();
+		m_handIndex = new Dictionary<Hand,int> ();
 
         for (int i = 0; i < 35; i++)
         {
@@ -78,19 +81,32 @@ public class Deck
             DragonTileHand = h;
         }
     }
+	public void OnPlayerAdd(Hand addedHand,List<SPlayer> OtherPlayersIn) {
+		m_handIndex.Add(addedHand, OtherPlayersIn.Count - 1);
+		for (int i = 0; i < 3; i ++ ){ 
+			DrawCard (addedHand);
+		}
+	}
 	public void OnPlayerRemove(Hand removedHand,List<SPlayer> OtherPlayersIn) {
-		//Hand goes back in the deck
+		if (!m_handIndex.ContainsKey (removedHand))
+			Debug.LogError ("Attempting to remove Hand before being added");
+		int removedIndex = m_handIndex [removedHand];
 		foreach (Tile t in removedHand.Pieces) {
 			DrawDeck.Add (t);
 		}
 		if (DragonTileHand == removedHand) {
-			int index = (removedHand.PlayerIndex ) % OtherPlayersIn.Count;
+			int index = (removedIndex ) % OtherPlayersIn.Count;
 			DragonTileHand = OtherPlayersIn [index].MyHand;
 		}
 		if (DragonTileHand != null)
-			m_RefillHands (OtherPlayersIn, DragonTileHand.PlayerIndex);
-
+			m_RefillHands (OtherPlayersIn, m_handIndex[DragonTileHand]);
+		
+		m_handIndex.Remove (removedHand);
+		for (int i = removedIndex; i < OtherPlayersIn.Count; i ++) {
+			m_handIndex[OtherPlayersIn[i].MyHand] = i;
+		}
 	}
+
 	void m_RefillHands(List<SPlayer> playersIn, int index) {
 		int numberWithThree = 0;
 		while (DrawDeck.Count > 0) {
@@ -109,6 +125,7 @@ public class Deck
 		}
 		DragonTileHand = null;
 	}
+
     public static void Tests()
     {
         Debug.Log("Running Tests in Deck");
@@ -125,15 +142,8 @@ public class Deck
 
         Debug.Assert(b.CurrentDeck.DrawDeck.Count == 29);
 
-        Debug.Assert(p2.MyHand.Pieces[0].IsEqual(fullDeck.DrawDeck[3]));
-        Debug.Assert(p1.MyHand.Pieces[2].IsEqual(fullDeck.DrawDeck[2]));
-        
+		Debug.Assert(p2.MyHand.Pieces[0].IsEquals(fullDeck.DrawDeck[3]));
+		Debug.Assert(p1.MyHand.Pieces[2].IsEquals(fullDeck.DrawDeck[2]));
     }
+
 }
-
-//Debug.Assert(b.CurrentDeck.Count == 35, "Correct number of tiles in deck");
-//Debug.Assert(b.CurrentDeck.Count == 32, "Correct number of tiles given to player");
-	//	Debug.Assert(sp.MyHand.Count == 3, "Correct number of tiles in player hand");
-
-		
-

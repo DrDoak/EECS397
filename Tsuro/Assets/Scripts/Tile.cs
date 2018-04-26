@@ -4,24 +4,46 @@ using UnityEngine;
 
 public class Tile {
 
-	private List<Vector2Int> m_paths;
-    public readonly List<Vector2Int> OriginalPaths;
 	public Vector2Int Coordinate { get; private set; }
+	public readonly List<Vector2Int> OriginalPaths;
+
 	private Direction m_rotation;
+	private List<Vector2Int> m_paths;
 
 	public Tile(List<Vector2Int> pathList) {
+		if (!isValidPath (pathList)) {
+			System.ArgumentException e = new System.ArgumentException ();
+			Debug.LogException (e);
+		}
         OriginalPaths = pathList;
 		m_rotation = Direction.UP;
 		m_paths = pathList;
 	}
-	public void SetCoordinateAndDirection(Vector2Int c, Direction r) {
-		Coordinate = c;
-		m_rotation = r;
-		SetRotation (r);
+	internal void SetCoordinate(Vector2Int coordinate) {
+		Coordinate = coordinate;
+	}
+	public override string ToString()
+	{
+		string s = "Rotation: " + m_rotation.ToString() + " Rotated Paths: ";
+		foreach (Vector2Int path in m_paths)
+		{
+			s += path.ToString();
+		}
+		return s;
 	}
 
+	public bool IsEquals(Tile otherTile)
+	{
+		for (int i = 0; i < m_paths.Count; i++)
+		{
+			if (OriginalPaths[i] != otherTile.OriginalPaths[i])
+				return false;
+		}
+		return true;
+	}
 	public void SetRotation ( Direction r)
     {
+		m_rotation = r;
 		m_paths = new List<Vector2Int> ();
 		foreach (Vector2Int p in OriginalPaths) {
 			m_paths.Add(getRotatedPath(p,r));
@@ -45,7 +67,15 @@ public class Tile {
 	private int getRotatedCoordinate(int coord, Direction r) {
 		return (coord + (2 * (int)r)) % 8;
 	}
-		
+
+	private bool isValidPath(List<Vector2Int> paths) {
+		if (paths.Count != 4)
+			return false;
+		foreach (Vector2Int p in paths)
+			if (p.x < 0 || p.x > 7 || p.y < 0 || p.y > 7)
+				return false;
+		return true;
+	}
 		
 	public static void Tests() {
 		Debug.Log ("Running Tests in Tile");
@@ -75,32 +105,13 @@ public class Tile {
 		Vector2Int p = new Vector2Int (0, 5);
 		Debug.Assert (t.getRotatedPath (p, Direction.DOWN).Equals(new Vector2Int(4,1)), "Path rotation");
 
-		t.SetCoordinateAndDirection (new Vector2Int (2, 3), Direction.LEFT);
+		t.SetCoordinate (new Vector2Int (2, 3));
+		t.SetRotation (Direction.LEFT);
 		Debug.Assert (t.m_paths[1].Equals(new Vector2Int(7,1)), "Place Tile rotation");
 		Debug.Assert (t.OriginalPaths[3].Equals(new Vector2Int(4,7)), "Original paths preserved");
 		Debug.Assert (t.GetPathConnection (7) == 1, "Sent valid path");
 
-        Debug.Assert(t.IsEqual(t2), "tiles are equal");
-        Debug.Assert(!(t.IsEqual(t3)), "tiles are not equal");
-    }
-
-     public override string ToString()
-    {
-        string s = "Rotation: " + m_rotation.ToString() + " RotPaths: ";
-        foreach (Vector2Int path in m_paths)
-        {
-            s += path.ToString();
-        }
-        return s;
-    }
-
-    public bool IsEqual(Tile otherTile)
-    {
-        for (int i = 0; i < m_paths.Count; i++)
-        {
-            if (OriginalPaths[i] != otherTile.OriginalPaths[i])
-                return false;
-        }
-        return true;
+		Debug.Assert(t.IsEquals(t2), "tiles are equal");
+		Debug.Assert(!(t.IsEquals(t3)), "tiles are not equal");
     }
 }

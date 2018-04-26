@@ -7,15 +7,12 @@ public class SPlayer {
     public Hand MyHand { get; private set; }
     public int PositionOnTile { get; private set; }
 
-
 	private Color m_color;
 	public Vector2Int Coordinate;
 
 	public SPlayer() {
 		MyHand = new Hand ();
 	}
-
-	
     
 	public Tile PlayTile(Tile t) {
 		MyHand.RemoveFromHand (t);
@@ -31,11 +28,11 @@ public class SPlayer {
 	{
 		return (Coordinate == coord && PositionOnTile == pos);
 	}
+
 	public void MoveToPosition(Vector2Int pos , int tilePos) {
 		Coordinate = pos;
 		PositionOnTile = tilePos;
 	}
-
 
 	public static void Tests() {
 		Debug.Log ("Running Tests in SPlayer");

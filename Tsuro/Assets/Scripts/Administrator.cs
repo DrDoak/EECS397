@@ -13,7 +13,7 @@ public class Administrator {
         {
             return false;
         }
-		if (IsEliminatePlayer(sp, b, t) && HasLegalMoves (sp, b))
+		if (b.IsPlayerEliminated (sp, t) && HasLegalMoves (sp, b))
         {
             return false;
         }
@@ -25,22 +25,17 @@ public class Administrator {
         foreach (Tile t in sp.MyHand.Pieces)
         {
 			Tile tempT = new Tile(t.OriginalPaths);
+			tempT.SetCoordinate (sp.Coordinate);
             for (int i = 0; i < 4; i++)
             {
-				tempT.SetCoordinateAndDirection(sp.Coordinate,(Direction)i);
-				if (!IsEliminatePlayer(sp, b, tempT)) {
+				tempT.SetRotation((Direction)i);
+				if (!b.IsPlayerEliminated (sp, tempT)) {
                     return true;
                 };
             }
         }  
         return false;
     }
-
-	bool IsEliminatePlayer (SPlayer sp, Board b, Tile t)
-	{
-		return  b.IsPlayerEliminated (sp, t.Coordinate, sp.PositionOnTile, t);
-    }
-
 
     TurnOutput PlayATurn(List<Tile> DrawPile, List<SPlayer> PlayersIn, List<SPlayer> PlayersOut, Board b, Tile PlacedTile)
     {
@@ -73,10 +68,11 @@ public class Administrator {
 		b.AddNewPlayer (p1, new Vector2Int (0, 0), 7);
 		b.AddNewPlayer (p2, new Vector2Int (0, 0), 6);
 
-		p1.MyHand.Pieces[0].SetCoordinateAndDirection (new Vector2Int (0, 0), Direction.UP);
+		p1.MyHand.Pieces [0].SetCoordinate (new Vector2Int (0, 0));
+		p1.MyHand.Pieces[0].SetRotation(Direction.UP);
 
 		//making a move from the edge
-		Debug.Assert (a.IsEliminatePlayer (p1, b, p1.MyHand.Pieces[0]), "Detects when a move eliminates a player");
+		//Debug.Assert (a.IsEliminatePlayer (p1, b, p1.MyHand.Pieces[0]), "Detects when a move eliminates a player");
 		Debug.Assert (p1.Coordinate == new Vector2Int(0,0), "Elimination test did not actually move player");
 		Debug.Assert (a.HasLegalMoves(p1,b), "Finds that player is able to place something");
 
@@ -85,11 +81,13 @@ public class Administrator {
         Debug.Assert(!a.LegalPlay(p1, b, p1.MyHand.Pieces[1]), "Determines that the play is illegal for eliminating player");
         Debug.Assert (a.LegalPlay(p1,b,p1.MyHand.Pieces[2]), "Determines that the play is legal");
 
-		p1.MyHand.Pieces [0].SetCoordinateAndDirection (new Vector2Int (1, 0), Direction.UP);
+		p1.MyHand.Pieces [0].SetCoordinate (new Vector2Int (1, 0));
+		p1.MyHand.Pieces[0].SetRotation(Direction.UP);
 		Debug.Assert(!a.LegalPlay(p1, b, p1.MyHand.Pieces[0]), " play is illegal due to tile not being in same location as player");
 
 		//making a move where the tile is not placed in its original position (i.e., it is rotated)
-		p1.MyHand.Pieces [1].SetCoordinateAndDirection (new Vector2Int (0, 0), Direction.RIGHT);
+		p1.MyHand.Pieces [1].SetCoordinate(new Vector2Int (0, 0));
+		p1.MyHand.Pieces[1].SetRotation(Direction.RIGHT);
 		Debug.Assert(a.LegalPlay(p1, b, p1.MyHand.Pieces[1]), "Determines that the play is legal after a rotation");
        	Debug.Assert (!a.LegalPlay(p1,b,b.CurrentDeck.DrawDeck[14]), "Determines that the play is illegal due to tile not being in hand");
 
@@ -98,7 +96,7 @@ public class Administrator {
 		Debug.Assert (p1.MyHand.Pieces.Count == 2, "Player removed a card from deck");
 		Debug.Assert (a.PlayATurn (b.CurrentDeck.DrawDeck, b.CurrentPlayersIn, b.CurrentPlayersOut, b,oldThirdTile).ContinueGame, "Determines that a play did not end the game");
 		Debug.Assert (p1.MyHand.Pieces.Count == 3, "Player drew a card back from the deck");
-		Debug.Assert (!p1.MyHand.Pieces [2].IsEqual (oldThirdTile), "Card drawn is different from old card");
+		Debug.Assert (!p1.MyHand.Pieces [2].IsEquals (oldThirdTile), "Card drawn is different from old card");
 		Debug.Assert (b.CurrentDeck.DrawDeck.Count == 28, "Deck has been decremented");
 		Debug.Assert (p1.Coordinate == new Vector2Int (1, 0), "Player one moved to correct location");
 		Debug.Assert (p2.Coordinate == new Vector2Int (0, 1), "Player two moved to correct location");
@@ -114,7 +112,8 @@ public class Administrator {
 		//Just placing a tile on the board for testing
 		b.PlaceTile(p1.MyHand.Pieces[1], new Vector2Int(1,0),Direction.UP);
 		Tile oldTile = p1.MyHand.RemoveFromHand (p1.MyHand.Pieces[2]);
-		oldTile.SetCoordinateAndDirection (new Vector2Int (0, 0), Direction.UP);
+		oldTile.SetCoordinate (new Vector2Int (0, 0));
+		oldTile.SetRotation(Direction.UP);
 		//a.PlayATurn (b.CurrentDeck.DrawDeck, b.CurrentPlayersIn, b.CurrentPlayersOut, b,oldTile);
 		a.PlayATurn(b.CurrentDeck.DrawDeck,b.CurrentPlayersIn, b.CurrentPlayersOut, b, oldTile);
 		Debug.Assert (p1.Coordinate == new Vector2Int (2, 0), "Player moves across two spaces");
@@ -132,7 +131,8 @@ public class Administrator {
 		Debug.Assert (b.CurrentDeck.DragonTileHand == null, "No player has Dragon tile beforehand");
 
 		oldTile = p1.MyHand.RemoveFromHand (p1.MyHand.Pieces[1]);
-		oldTile.SetCoordinateAndDirection (new Vector2Int (0, 0), Direction.DOWN);
+		oldTile.SetCoordinate (new Vector2Int (0, 0));
+		oldTile.SetRotation(Direction.DOWN);
 
 		TurnOutput to = a.PlayATurn(b.CurrentDeck.DrawDeck,b.CurrentPlayersIn, b.CurrentPlayersOut, b, oldTile);
 
@@ -158,7 +158,8 @@ public class Administrator {
 		Debug.Assert (b.CurrentDeck.DragonTileHand == p1.MyHand, "Dragon Tile owner is now player 1");
 
 		oldTile = p1.MyHand.RemoveFromHand (p1.MyHand.Pieces[2]);
-		oldTile.SetCoordinateAndDirection (new Vector2Int (0, 0), Direction.UP);
+		oldTile.SetCoordinate (new Vector2Int (0, 0));
+		oldTile.SetRotation(Direction.UP);
 		a.PlayATurn(b.CurrentDeck.DrawDeck,b.CurrentPlayersIn, b.CurrentPlayersOut, b, oldTile);
 
 		Debug.Assert (b.CurrentDeck.DragonTileHand == p1.MyHand, "Player 1 still has dragon tile afterwards");
@@ -180,8 +181,9 @@ public class Administrator {
 		b.CurrentDeck.DrawCard (p1.MyHand);
 
 		oldTile = p1.MyHand.RemoveFromHand (p1.MyHand.Pieces[1]);
-		oldTile.SetCoordinateAndDirection (new Vector2Int (0, 0), Direction.DOWN);
-	
+		oldTile.SetCoordinate (new Vector2Int (0, 0));
+		oldTile.SetRotation(Direction.DOWN);
+
 		//P2 is eliminated
 		a.PlayATurn(b.CurrentDeck.DrawDeck,b.CurrentPlayersIn, b.CurrentPlayersOut, b, oldTile);
 
@@ -208,8 +210,8 @@ public class Administrator {
 		p3.MyHand.RemoveFromHand (p3.MyHand.Pieces[1]);
 
 		int oldP1Count = p1.MyHand.Pieces.Count;
-		oldTile.SetCoordinateAndDirection (new Vector2Int (0, 0), Direction.DOWN);
-
+		oldTile.SetCoordinate (new Vector2Int (0, 0));
+		oldTile.SetRotation(Direction.DOWN);
 
 		//Eliminate Player 2
 		a.PlayATurn(b.CurrentDeck.DrawDeck,b.CurrentPlayersIn, b.CurrentPlayersOut, b, oldTile);
@@ -233,7 +235,8 @@ public class Administrator {
 		b.CurrentDeck.DrawCard (p1.MyHand);
 
 		oldTile = p1.MyHand.RemoveFromHand (p1.MyHand.Pieces[1]);
-		oldTile.SetCoordinateAndDirection (new Vector2Int (0, 0), Direction.DOWN);
+		oldTile.SetCoordinate (new Vector2Int (0, 0));
+		oldTile.SetRotation(Direction.DOWN);
 
 		p2.MyHand.RemoveFromHand (p2.MyHand.Pieces[1]);
 		p3.MyHand.RemoveFromHand (p3.MyHand.Pieces[1]);

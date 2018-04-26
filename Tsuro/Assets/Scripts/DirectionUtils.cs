@@ -7,7 +7,7 @@ public enum Direction { UP, RIGHT, DOWN, LEFT , NONE}
 
 public static class DirectionUtils {
 
-	public static int AdjacentPos(int i) {
+	public static int AdjacentPosition(int i) {
 		if (i % 2 == 0)
 			return ( i + 5 )% 8;
 		return (i + 3) % 8;
@@ -27,6 +27,9 @@ public static class DirectionUtils {
 	}
 
 	public static Direction IntToDirection(int pos) {
+		if (pos < 0 || pos > 7)
+			Debug.LogError("Position Integer does not correlate to position on tile. Expected integer in range 0-7");
+		
 		if (pos == 0 || pos == 1)
 			return Direction.UP;
 		if (pos == 2 || pos == 3)
@@ -49,6 +52,7 @@ public static class DirectionUtils {
 			case Direction.LEFT:
 				return Direction.RIGHT;
 			default:
+				Debug.LogError ("Attempting to invert invalid direction");
 				return Direction.NONE;
 		}
 	}
@@ -97,8 +101,8 @@ public static class DirectionUtils {
 		p.PlayTile (t);
 
 		Debug.Assert (IntToDirection(4) == Direction.DOWN, "Integer to correct direction");
-		Debug.Assert (IntToDirection(-1) == Direction.NONE, "Invalid direction found");
-		Debug.Assert (IntToDirection(14) == Direction.NONE, "Invalid direction found");
+		//Debug.Assert (IntToDirection(-1) == Direction.NONE, "Invalid direction found");
+		//Debug.Assert (IntToDirection(14) == Direction.NONE, "Invalid direction found");
 
 		p.MoveToPosition (t.Coordinate, 7);
 		Debug.Assert (p.IsOnEdge (t.Coordinate, Direction.LEFT), "Detected Correct Direction");
@@ -109,6 +113,6 @@ public static class DirectionUtils {
 		Debug.Assert (VectorToDirection(new Vector2Int(-1,0)) == Direction.LEFT , "Vector to Direction");
 		Debug.Assert (VectorToDirection(new Vector2Int(0,0)) == Direction.NONE , "Invalid vector found");
 
-		Debug.Assert (AdjacentPos (7) == 2, "Correct adjacent position");
+		Debug.Assert (AdjacentPosition (7) == 2, "Correct adjacent on neighboring tile position");
 	}
 }

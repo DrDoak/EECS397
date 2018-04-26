@@ -18,23 +18,17 @@ public class Board {
 		CurrentDeck = new Deck();
 	}
 
-	
-
 	public bool AddNewPlayer(SPlayer sp, Vector2Int coord, int positionOnTile) {
 		if (isEdgePosition(coord,positionOnTile) &&
 			GetCollisionPlayer (sp , coord, positionOnTile) == null) {
-			sp.MyHand.PlayerIndex = CurrentPlayersIn.Count;
 			CurrentPlayersIn.Add(sp);
 			sp.MoveToPosition(coord,positionOnTile);
-			for (int i = 0; i < 3; i ++ ){ 
-				CurrentDeck.DrawCard (sp.MyHand);
-			}
+			CurrentDeck.OnPlayerAdd (sp.MyHand, CurrentPlayersIn);
 			return true;
 		}
 		return false;
 	}
-	
-	
+
 	public void AdvanceTurns(List<SPlayer> PlayersIn)
 	{
 		PlayersIn.Remove(PlayersIn[0]);
@@ -46,18 +40,15 @@ public class Board {
 		CurrentPlayersOut.Add(p);
 		CurrentPlayersIn.Remove(p);
 		CurrentDeck.OnPlayerRemove (p.MyHand,CurrentPlayersIn);
-		for (int i = p.MyHand.PlayerIndex; i < CurrentPlayersIn.Count; i ++) {
-			CurrentPlayersIn[i].MyHand.PlayerIndex = i;
-		}
 	}
-
 
 	public Tile PlaceTile(Tile t, Vector2Int coordinate, Direction rotation)
     {
 		if (!isPositionInBoard (coordinate))
 			return null;
 		m_placedTiles [coordinate] = t;
-		t.SetCoordinateAndDirection (coordinate, rotation);
+		t.SetCoordinate (coordinate);
+		t.SetRotation (rotation);
 		return t;
     }
 
@@ -67,7 +58,7 @@ public class Board {
 		if (sp.Coordinate == t.Coordinate) {
 			int movedPosition = t.GetPathConnection (sp.PositionOnTile);
 			Vector2Int newCoord = sp.Coordinate + DirectionUtils.DirectionToVector(DirectionUtils.IntToDirection(movedPosition));
-			int newPos = DirectionUtils.AdjacentPos (movedPosition);
+			int newPos = DirectionUtils.AdjacentPosition (movedPosition);
 			sp.MoveToPosition ( newCoord, newPos);
 			SPlayer colP = GetCollisionPlayer (sp, newCoord, newPos);
 			if (colP != null) {
@@ -85,30 +76,29 @@ public class Board {
 		return playersEliminated;
     }
 
-	public bool IsPlayerEliminated(SPlayer sp, Vector2Int startCoord, int startPos , Tile t)
+	public bool IsPlayerEliminated(SPlayer sp, Tile t) {
+		return m_isPlayerEliminated (sp, sp.Coordinate, sp.PositionOnTile, t);
+	}
+
+	public bool m_isPlayerEliminated(SPlayer sp, Vector2Int startCoord, int startPos , Tile t)
 	{
-      //  Debug.Log("Starting coordinate: " + startCoord + " tile coord " + t.Coordinate);
-      //  Debug.Log("Tile is: " + t.ToString());
 		if (t == null)
 			return false;
 		if (startCoord == t.Coordinate) {
 			int movedPosition = t.GetPathConnection (startPos);
             
 			Vector2Int newCoord = startCoord + DirectionUtils.DirectionToVector(DirectionUtils.IntToDirection(movedPosition));
-			int newPos = DirectionUtils.AdjacentPos (movedPosition);
-        //    Debug.Log("Moving position from" + startPos + " to: " + movedPosition + "new coord is: " + newCoord);
+			int newPos = DirectionUtils.AdjacentPosition (movedPosition);
             SPlayer colP = GetCollisionPlayer (sp, newCoord, newPos);
 			if (colP != null) {
-       //         Debug.Log("Player eliminated due to collision");
 				return true;
 			}
 
 			if (!isPositionInBoard (newCoord)) {
-      //          Debug.Log("Player eliminated due to being at position: " + newCoord);
 				return true;
 			}
 			if (m_placedTiles.ContainsKey (newCoord))
-				IsPlayerEliminated (sp, newCoord, newPos, m_placedTiles [newCoord]);
+				return m_isPlayerEliminated (sp, newCoord, newPos, m_placedTiles [newCoord]);
 		}
 		return false;
 	}
@@ -119,19 +109,6 @@ public class Board {
 				return p;
 		}
 		return null;
-	}
-
-	private Direction DirectionToTile(Tile fromTile, Tile toTile) {
-		Vector2Int diff = toTile.Coordinate - fromTile.Coordinate;
-		if (diff.x == 1 && diff.y == 0)
-			return Direction.RIGHT;
-		if (diff.x == -1 && diff.y == 0)
-			return Direction.LEFT;
-		if (diff.x == 0 && diff.y == 1)
-			return Direction.UP;
-		if (diff.x == 0 && diff.y == -1)
-			return Direction.DOWN;
-		return Direction.NONE;
 	}
 
 	public List<SPlayer> GetAdjacentPlayers(Tile placedTile) {
