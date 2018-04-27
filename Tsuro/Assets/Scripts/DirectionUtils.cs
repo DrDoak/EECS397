@@ -1,6 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+<<<<<<< HEAD
+=======
+using UnityEngine.TestTools;
+using NUnit.Framework;
+>>>>>>> 74f46f4f12ee3cfba08c1c2b6edf7cdbe2c81cc7
 
 
 public enum Direction { UP, RIGHT, DOWN, LEFT , NONE}
@@ -28,7 +33,7 @@ public static class DirectionUtils {
 
 	public static Direction IntToDirection(int pos) {
 		if (pos < 0 || pos > 7)
-			Debug.LogError("Position Integer does not correlate to position on tile. Expected integer in range 0-7");
+			throw new System.ArgumentException ();
 		
 		if (pos == 0 || pos == 1)
 			return Direction.UP;
@@ -52,7 +57,7 @@ public static class DirectionUtils {
 			case Direction.LEFT:
 				return Direction.RIGHT;
 			default:
-				Debug.LogError ("Attempting to invert invalid direction");
+				throw new System.ArgumentException ();
 				return Direction.NONE;
 		}
 	}
@@ -82,6 +87,7 @@ public static class DirectionUtils {
 			return  Direction.LEFT;
 		return Direction.NONE;
 	}
+<<<<<<< HEAD
 
 	public static void Tests() {
 		Debug.Log ("Running Tests in DirectionUtils");
@@ -117,3 +123,6 @@ public static class DirectionUtils {
 
 	}
 }
+=======
+}
+>>>>>>> 74f46f4f12ee3cfba08c1c2b6edf7cdbe2c81cc7

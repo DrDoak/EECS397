@@ -20,7 +20,7 @@ public class Board {
 
 	public bool AddNewPlayer(SPlayer sp, Vector2Int coord, int positionOnTile) {
 		if (isEdgePosition(coord,positionOnTile) &&
-			GetCollisionPlayer (sp , coord, positionOnTile) == null) {
+			getCollisionPlayer (sp , coord, positionOnTile) == null) {
 			CurrentPlayersIn.Add(sp);
 			sp.MoveToPosition(coord,positionOnTile);
 			CurrentDeck.OnPlayerAdd (sp.MyHand, CurrentPlayersIn);
@@ -46,6 +46,8 @@ public class Board {
     {
 		if (!isPositionInBoard (coordinate))
 			return null;
+		if (m_placedTiles.ContainsKey (coordinate))
+			return null;
 		m_placedTiles [coordinate] = t;
 		t.SetCoordinate (coordinate);
 		t.SetRotation (rotation);
@@ -60,7 +62,7 @@ public class Board {
 			Vector2Int newCoord = sp.Coordinate + DirectionUtils.DirectionToVector(DirectionUtils.IntToDirection(movedPosition));
 			int newPos = DirectionUtils.AdjacentPosition (movedPosition);
 			sp.MoveToPosition ( newCoord, newPos);
-			SPlayer colP = GetCollisionPlayer (sp, newCoord, newPos);
+			SPlayer colP = getCollisionPlayer (sp, newCoord, newPos);
 			if (colP != null) {
 				playersEliminated.Add (sp);
 				playersEliminated.Add (colP);
@@ -89,7 +91,7 @@ public class Board {
             
 			Vector2Int newCoord = startCoord + DirectionUtils.DirectionToVector(DirectionUtils.IntToDirection(movedPosition));
 			int newPos = DirectionUtils.AdjacentPosition (movedPosition);
-            SPlayer colP = GetCollisionPlayer (sp, newCoord, newPos);
+            SPlayer colP = getCollisionPlayer (sp, newCoord, newPos);
 			if (colP != null) {
 				return true;
 			}
@@ -101,14 +103,6 @@ public class Board {
 				return m_isPlayerEliminated (sp, newCoord, newPos, m_placedTiles [newCoord]);
 		}
 		return false;
-	}
-
-	private SPlayer GetCollisionPlayer(SPlayer sp, Vector2Int coord, int pos) {
-		foreach (SPlayer p in CurrentPlayersIn) {
-			if (p != sp && p.IsAtPosition (coord, pos))
-				return p;
-		}
-		return null;
 	}
 
 	public List<SPlayer> GetAdjacentPlayers(Tile placedTile) {
@@ -124,6 +118,14 @@ public class Board {
 		return pList;
 	}
 
+	private SPlayer getCollisionPlayer(SPlayer sp, Vector2Int coord, int pos) {
+		foreach (SPlayer p in CurrentPlayersIn) {
+			if (p != sp && p.IsAtPosition (coord, pos))
+				return p;
+		}
+		return null;
+	}
+
 	private bool isPositionInBoard (Vector2Int pos) {
 		return (pos.x >= 0 && pos.x < m_boardSize.x 
 			&& pos.y >= 0 && pos.y < m_boardSize.y);
@@ -134,62 +136,5 @@ public class Board {
 			(pos.x == m_boardSize.x - 1 && DirectionUtils.IntToDirection (positionOnTile) == Direction.RIGHT) ||
 			(pos.y == 0 && DirectionUtils.IntToDirection (positionOnTile) == Direction.DOWN) ||
 			(pos.y == m_boardSize.x - 1 && DirectionUtils.IntToDirection (positionOnTile) == Direction.UP));
-	}
-
-	public static void Tests() {
-		Debug.Log ("Running Tests in Board");
-		Board b = new Board (new Vector2Int(6,6));
-
-		Debug.Assert (b.isPositionInBoard (new Vector2Int (0, 0)), "Position in board");
-		Debug.Assert (!b.isPositionInBoard (new Vector2Int (-4, 0)), "Position not in board");
-		Debug.Assert (!b.isPositionInBoard (new Vector2Int (0, 9)), "Position not in board");
-
-		List<Vector2Int> testPaths = new List<Vector2Int> ();
-		testPaths.Add (new Vector2Int (0, 5));
-		testPaths.Add (new Vector2Int (1, 3));
-		testPaths.Add (new Vector2Int (2, 6));
-		testPaths.Add (new Vector2Int (4, 7));
-		Tile t = new Tile (testPaths);
-
-		Debug.Assert (b.PlaceTile (t, new Vector2Int (0, 4), Direction.UP) != null, "On board placement");
-
-		List<Vector2Int> testPaths2 = new List<Vector2Int> ();
-		testPaths2.Add (new Vector2Int (0, 4));
-		testPaths2.Add (new Vector2Int (1, 5));
-		testPaths2.Add (new Vector2Int (2, 6));
-		testPaths2.Add (new Vector2Int (3, 7));
-		Tile t2 = new Tile (testPaths2);
-
-		Debug.Assert (b.PlaceTile (t2, new Vector2Int (0, 6), Direction.DOWN) == null, "Off board placement");
-
-		b.PlaceTile (t2,new Vector2Int(0,5), Direction.DOWN);
-
-		List<Vector2Int> testPaths3 = new List<Vector2Int> ();
-		testPaths3.Add (new Vector2Int (0, 1));
-		testPaths3.Add (new Vector2Int (2, 3));
-		testPaths3.Add (new Vector2Int (4, 5));
-		testPaths3.Add (new Vector2Int (6, 7));
-		Tile t3 = new Tile (testPaths3);
-
-		b.PlaceTile (t3, new Vector2Int (1, 4), Direction.UP);
-
-		SPlayer sp = new SPlayer ();
-
-		Debug.Assert (!b.isEdgePosition( new Vector2Int(4,4),0), "invalid edge position");
-		Debug.Assert (!b.AddNewPlayer (sp, new Vector2Int(0,4),0), "invalid player addition");
-		Debug.Assert (b.AddNewPlayer (sp, new Vector2Int(0,4),7), "valid player addition");
-
-		
-		SPlayer sp2 = new SPlayer ();
-		Debug.Assert (b.GetCollisionPlayer (sp2, new Vector2Int (0, 4), 7) == sp, "Detected potential collision");
-		Debug.Assert (!b.AddNewPlayer (sp2, new Vector2Int (0, 4), 7), "Not insert player due to collision");
-			
-		Debug.Assert (b.GetAdjacentPlayers (t3).Count == 0, "Did not incorrectly grab a player");
-		Debug.Assert (b.GetAdjacentPlayers (t).Count == 1, "Found adjacent player");
-
-		b.MovePlayer (sp, t);
-
-		Debug.Assert ( sp.Coordinate == new Vector2Int(0,3), "Moved player to correct coordinate");
-		Debug.Assert ( sp.PositionOnTile == 1, "Moved player to correct position");
 	}
 }

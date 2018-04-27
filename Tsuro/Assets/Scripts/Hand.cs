@@ -26,6 +26,8 @@ public class Hand {
 
     public Tile RemoveFromHand (Tile t)
     {
+		if (!Pieces.Contains (t))
+			return null;
         Pieces.Remove(t);
 		return t;
     }

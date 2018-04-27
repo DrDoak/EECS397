@@ -12,14 +12,13 @@ public class Tile {
 
 	public Tile(List<Vector2Int> pathList) {
 		if (!isValidPath (pathList)) {
-			System.ArgumentException e = new System.ArgumentException ();
-			Debug.LogException (e);
+			throw new System.ArgumentException ();
 		}
         OriginalPaths = pathList;
 		m_rotation = Direction.UP;
 		m_paths = pathList;
 	}
-	internal void SetCoordinate(Vector2Int coordinate) {
+	public void SetCoordinate(Vector2Int coordinate) {
 		Coordinate = coordinate;
 	}
 	public override string ToString()
@@ -32,8 +31,13 @@ public class Tile {
 		return s;
 	}
 
-	public bool IsEquals(Tile otherTile)
+	public override bool Equals (object obj)
 	{
+		Tile otherTile = obj as Tile;
+
+		if (otherTile == null)
+			return false;
+		
 		for (int i = 0; i < m_paths.Count; i++)
 		{
 			if (OriginalPaths[i] != otherTile.OriginalPaths[i])
@@ -41,6 +45,7 @@ public class Tile {
 		}
 		return true;
 	}
+
 	public void SetRotation ( Direction r)
     {
 		m_rotation = r;
@@ -138,11 +143,17 @@ public class Tile {
 	private bool isValidPath(List<Vector2Int> paths) {
 		if (paths.Count != 4)
 			return false;
-		foreach (Vector2Int p in paths)
-			if (p.x < 0 || p.x > 7 || p.y < 0 || p.y > 7)
+		List<int> numbersUsed = new List<int> ();
+		foreach (Vector2Int p in paths) {
+			if (p.x < 0 || p.x > 7 || p.y < 0 || p.y > 7 ||
+				numbersUsed.Contains(p.x) || numbersUsed.Contains(p.y))
 				return false;
+			numbersUsed.Add (p.x);
+			numbersUsed.Add (p.y);
+		}
 		return true;
 	}
+<<<<<<< HEAD
 		
 	public static void Tests() {
 		Debug.Log ("Running Tests in Tile");
@@ -200,4 +211,6 @@ public class Tile {
         Debug.Assert(t4.SymmetryScore() == 3);
         Debug.Log(t5.SymmetryScore());
     }
+=======
+>>>>>>> 74f46f4f12ee3cfba08c1c2b6edf7cdbe2c81cc7
 }
