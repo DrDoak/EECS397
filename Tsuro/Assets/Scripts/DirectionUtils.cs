@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.TestTools;
+using NUnit.Framework;
 
 
 public enum Direction { UP, RIGHT, DOWN, LEFT , NONE}
@@ -29,7 +30,7 @@ public static class DirectionUtils {
 
 	public static Direction IntToDirection(int pos) {
 		if (pos < 0 || pos > 7)
-			Debug.LogError("Position Integer does not correlate to position on tile. Expected integer in range 0-7");
+			throw new System.ArgumentException ();
 		
 		if (pos == 0 || pos == 1)
 			return Direction.UP;
@@ -53,7 +54,7 @@ public static class DirectionUtils {
 			case Direction.LEFT:
 				return Direction.RIGHT;
 			default:
-				Debug.LogError ("Attempting to invert invalid direction");
+				throw new System.ArgumentException ();
 				return Direction.NONE;
 		}
 	}
@@ -82,40 +83,5 @@ public static class DirectionUtils {
 		if (v == new Vector2Int(-1,0))
 			return  Direction.LEFT;
 		return Direction.NONE;
-	}
-
-	public static void Tests() {
-		Debug.Log ("Running Tests in DirectionUtils");
-
-		List<Vector2Int> testPaths = new List<Vector2Int> ();
-		testPaths.Add (new Vector2Int (0, 5));
-		testPaths.Add (new Vector2Int (1, 3));
-		testPaths.Add (new Vector2Int (2, 6));
-		testPaths.Add (new Vector2Int (4, 7));
-		Tile t = new Tile (testPaths);
-
-		SPlayer p = new SPlayer ();
-		p.MyHand.AddToHand (t);
-		Debug.Assert ( DirectionMatch(Direction.RIGHT,3), "Direction Match");
-		Debug.Assert ( !DirectionMatch(Direction.RIGHT,0), "Direction mismatch found");
-		Debug.Assert ( !DirectionMatch(Direction.DOWN,9), "Not match for invalid positions");
-		p.PlayTile (t);
-
-		Debug.Assert (IntToDirection(4) == Direction.DOWN, "Integer to correct direction");
-		//Debug.Assert (IntToDirection(-1) == Direction.NONE, "Invalid direction found");
-		//Debug.Assert (IntToDirection(14) == Direction.NONE, "Invalid direction found");
-
-		p.MoveToPosition (t.Coordinate, 7);
-		Debug.Assert (p.IsOnEdge (t.Coordinate, Direction.LEFT), "Detected Correct Direction");
-
-		Debug.Assert (DirectionToVector(Direction.LEFT) == new Vector2Int(-1,0), "Direction to Vector");
-		Debug.Assert (DirectionToVector(Direction.NONE) == new Vector2Int(0,0), "Invalid direction found");
-
-		Debug.Assert (VectorToDirection(new Vector2Int(-1,0)) == Direction.LEFT , "Vector to Direction");
-		Debug.Assert (VectorToDirection(new Vector2Int(0,0)) == Direction.NONE , "Invalid vector found");
-
-		Debug.Assert (AdjacentPosition (7) == 2, "Correct adjacent on neighboring tile position");
-		LogAssert.Expect (IntToDirection (-1), "Attempting to invert invalid direction");
-
 	}
 }

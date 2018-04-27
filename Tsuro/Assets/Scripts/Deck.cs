@@ -69,6 +69,7 @@ public class Deck
             DrawDeck.Add(new Tile(AllPaths));       
         }
     }
+
 	public void DrawCard(Hand h)
     {
         if (DrawDeck.Count > 0)
@@ -100,7 +101,7 @@ public class Deck
 			DragonTileHand = OtherPlayersIn [index].MyHand;
 		}
 		if (DragonTileHand != null)
-			m_RefillHands (OtherPlayersIn, m_handIndex[DragonTileHand]);
+			refillHands (OtherPlayersIn, m_handIndex[DragonTileHand]);
 		
 		m_handIndex.Remove (removedHand);
 		for (int i = removedIndex; i < OtherPlayersIn.Count; i ++) {
@@ -108,7 +109,7 @@ public class Deck
 		}
 	}
 
-	void m_RefillHands(List<SPlayer> playersIn, int index) {
+	private void refillHands(List<SPlayer> playersIn, int index) {
 		int numberWithThree = 0;
 		while (DrawDeck.Count > 0) {
 			if (DragonTileHand.Pieces.Count >= 3) {
@@ -126,25 +127,4 @@ public class Deck
 		}
 		DragonTileHand = null;
 	}
-
-    public static void Tests()
-    {
-        Debug.Log("Running Tests in Deck");
-
-        Board b = new Board(new Vector2Int(6, 6));
-        SPlayer p1 = new SPlayer();
-        SPlayer p2 = new SPlayer();
-
-        Deck fullDeck = new Deck();
-        Debug.Assert(b.CurrentDeck.DrawDeck.Count == 35);
-
-        b.AddNewPlayer(p1, new Vector2Int(0, 0), 7);
-        b.AddNewPlayer(p2, new Vector2Int(0, 0), 6);
-
-        Debug.Assert(b.CurrentDeck.DrawDeck.Count == 29);
-
-		Debug.Assert(p2.MyHand.Pieces[0].IsEquals(fullDeck.DrawDeck[3]));
-		Debug.Assert(p1.MyHand.Pieces[2].IsEquals(fullDeck.DrawDeck[2]));
-    }
-
 }

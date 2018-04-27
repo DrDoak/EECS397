@@ -13,12 +13,10 @@ public class Main : MonoBehaviour {
 	}
 
 	void RunTests() {
-		Tile.Tests ();
-		SPlayer.Tests ();
-		DirectionUtils.Tests ();
+		/*Tile.Tests ();
 		Board.Tests ();
 		Deck.Tests();
 		Administrator.Tests ();
-
+		*/
 	}
 }

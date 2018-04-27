@@ -33,26 +33,4 @@ public class SPlayer {
 		Coordinate = pos;
 		PositionOnTile = tilePos;
 	}
-
-	public static void Tests() {
-		Debug.Log ("Running Tests in SPlayer");
-
-		List<Vector2Int> testPaths = new List<Vector2Int> ();
-		testPaths.Add (new Vector2Int (0, 5));
-		testPaths.Add (new Vector2Int (1, 3));
-		testPaths.Add (new Vector2Int (2, 6));
-		testPaths.Add (new Vector2Int (4, 7));
-		Tile t = new Tile (testPaths);
-
-		SPlayer p = new SPlayer ();
-		p.MyHand.AddToHand (t);
-		Debug.Assert (p.MyHand.IsInHand (t), "Basic Hand Tile addition");
-		p.PlayTile (t);
-		Debug.Assert (!p.MyHand.IsInHand (t), "Basic Hand Tile Playing");
-
-		p.MoveToPosition (new Vector2Int(2,3), 7);
-		Debug.Assert (p.IsOnEdge (new Vector2Int(2,3), Direction.LEFT), "Detected Correct Direction");
-		Debug.Assert (p.IsAtPosition (new Vector2Int(2,3), 7), "Detected Correct Position");
-
-	}
 }
