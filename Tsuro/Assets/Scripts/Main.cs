@@ -19,6 +19,8 @@ public class Main : MonoBehaviour {
 		Board.Tests ();
 		Deck.Tests();
 		Administrator.Tests ();
-
+        PlayerLocation.Tests();
+        Player.Tests();
+        
 	}
 }

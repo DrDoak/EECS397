@@ -60,7 +60,57 @@ public class Tile {
 		return -1;
 	}
 
-	private Vector2Int getRotatedPath(Vector2Int path, Direction r) {
+    public bool HasPath(Vector2Int p)
+    {
+        return (OriginalPaths.Contains(p));
+    }
+
+    public int SymmetryScore()
+    {
+        int symmetricpathcount = 0;
+
+        foreach (Vector2Int p in OriginalPaths)
+        {
+            int difference = ((p[1] - p[0]) % 8); 
+            if (difference == 4)
+            {
+                for (int i = 1; i < 4; i++)
+                {
+                    Vector2Int symmetricpath = new Vector2Int((p[0] + i) % 8, (p[1] + i) % 8);
+                    if (HasPath(symmetricpath))
+                    {
+                        symmetricpathcount++;
+                    }
+                }
+            }
+            else if ((difference % 2) == 0)
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    Vector2Int symmetricpath = new Vector2Int((p[0] + 2*i + 1) % 8, (p[1] + 2 * i + 1) % 8);
+                    if (HasPath(symmetricpath))
+                    {
+                        symmetricpathcount++;
+                    }
+                }
+            }
+            else if ((difference % 2) == 1)
+            {
+                for (int i = 1; i < 4; i++)
+                {
+                    Vector2Int symmetricpath = new Vector2Int((p[0] + 2 * i) % 8, (p[1] + 2 * i) % 8);
+                    if (HasPath(symmetricpath))
+                    {
+                        symmetricpathcount++;
+                    }
+                }
+            }
+            
+        }
+        return ((int) Mathf.Sqrt(symmetricpathcount));
+    }
+
+    private Vector2Int getRotatedPath(Vector2Int path, Direction r) {
 		return new Vector2Int (getRotatedCoordinate(path.x,r),getRotatedCoordinate(path.y,r));
 	}
 	
@@ -100,6 +150,13 @@ public class Tile {
         testPaths3.Add(new Vector2Int(5, 7));
         Tile t3 = new Tile(testPaths3);
 
+        List<Vector2Int> testPaths4 = new List<Vector2Int>();
+        testPaths4.Add(new Vector2Int(0, 1));
+        testPaths4.Add(new Vector2Int(2, 3));
+        testPaths4.Add(new Vector2Int(4, 5));
+        testPaths4.Add(new Vector2Int(6, 7));
+        Tile t4 = new Tile(testPaths4);
+
         Debug.Assert (t.getRotatedCoordinate (0, Direction.RIGHT) == 2, "Basic Coordinate Rotation");
 		Debug.Assert (t.getRotatedCoordinate (7, Direction.RIGHT) == 1, "Coordinate rotation overflow");
 		Vector2Int p = new Vector2Int (0, 5);
@@ -113,5 +170,9 @@ public class Tile {
 
 		Debug.Assert(t.IsEquals(t2), "tiles are equal");
 		Debug.Assert(!(t.IsEquals(t3)), "tiles are not equal");
+
+        Debug.Assert(t.SymmetryScore() == 0);
+        Debug.Assert(t3.SymmetryScore() == 2);
+        Debug.Assert(t4.SymmetryScore() == 3);
     }
 }
