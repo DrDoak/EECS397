@@ -65,7 +65,57 @@ public class Tile {
 		return -1;
 	}
 
-	private Vector2Int getRotatedPath(Vector2Int path, Direction r) {
+    public bool HasPath(Vector2Int p)
+    {
+        return (OriginalPaths.Contains(p));
+    }
+
+    public int SymmetryScore()
+    {
+        int symmetricpathcount = 0;
+
+        foreach (Vector2Int p in OriginalPaths)
+        {
+            int difference = ((p[1] - p[0]) % 8); 
+            if (difference == 4)
+            {
+                for (int i = 1; i < 4; i++)
+                {
+                    Vector2Int symmetricpath = new Vector2Int((p[0] + i) % 8, (p[1] + i) % 8);
+                    if (HasPath(symmetricpath))
+                    {
+                        symmetricpathcount++;
+                    }
+                }
+            }
+            else if ((difference % 2) == 0)
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    Vector2Int symmetricpath = new Vector2Int((p[0] + 2*i + 1) % 8, (p[1] + 2 * i + 1) % 8);
+                    if (HasPath(symmetricpath))
+                    {
+                        symmetricpathcount++;
+                    }
+                }
+            }
+            else if ((difference % 2) == 1)
+            {
+                for (int i = 1; i < 4; i++)
+                {
+                    Vector2Int symmetricpath = new Vector2Int((p[0] + 2 * i) % 8, (p[1] + 2 * i) % 8);
+                    if (HasPath(symmetricpath))
+                    {
+                        symmetricpathcount++;
+                    }
+                }
+            }
+            
+        }
+        return ((int) Mathf.Sqrt(symmetricpathcount));
+    }
+
+    private Vector2Int getRotatedPath(Vector2Int path, Direction r) {
 		return new Vector2Int (getRotatedCoordinate(path.x,r),getRotatedCoordinate(path.y,r));
 	}
 	
