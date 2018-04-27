@@ -9,7 +9,7 @@ public class TestTest {
 	[Test]
 	public void TestTestSimplePasses() {
 		// Use the Assert class to test conditions.
-		Assert(1 == 1);
+		//Assert(1 == 1);
 	}
 
 	// A UnityTest behaves like a coroutine in PlayMode

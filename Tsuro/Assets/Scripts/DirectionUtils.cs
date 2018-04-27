@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.TestTools;
 
 
 public enum Direction { UP, RIGHT, DOWN, LEFT , NONE}
@@ -115,7 +114,6 @@ public static class DirectionUtils {
 		Debug.Assert (VectorToDirection(new Vector2Int(0,0)) == Direction.NONE , "Invalid vector found");
 
 		Debug.Assert (AdjacentPosition (7) == 2, "Correct adjacent on neighboring tile position");
-		LogAssert.Expect (IntToDirection (-1), "Attempting to invert invalid direction");
 
 	}
 }

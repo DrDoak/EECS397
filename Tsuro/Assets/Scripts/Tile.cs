@@ -60,9 +60,26 @@ public class Tile {
 		return -1;
 	}
 
+    public Vector2Int PositionSwap(Vector2Int path)
+    {
+        Vector2Int swappedpath = new Vector2Int(path.y, path.x);
+        return swappedpath;
+    }
+
+    public List<Vector2Int> SwapAllPositions (List<Vector2Int> paths)
+    {
+        List<Vector2Int> swappedpathlist = new List<Vector2Int>();
+        for (int i = 0; i < 4; i++)
+        {
+            swappedpathlist.Add(PositionSwap(paths[i]));
+        }
+        return swappedpathlist;
+    }
+
     public bool HasPath(Vector2Int p)
     {
-        return (OriginalPaths.Contains(p));
+        List<Vector2Int> swappedlist = SwapAllPositions(OriginalPaths);
+        return (OriginalPaths.Contains(p) || swappedlist.Contains(p));
     }
 
     public int SymmetryScore()
@@ -74,9 +91,9 @@ public class Tile {
             int difference = ((p[1] - p[0]) % 8); 
             if (difference == 4)
             {
-                for (int i = 1; i < 4; i++)
+                for (int i = 0; i < 2; i++)
                 {
-                    Vector2Int symmetricpath = new Vector2Int((p[0] + i) % 8, (p[1] + i) % 8);
+                    Vector2Int symmetricpath = new Vector2Int((p[0] + 2 * i + 5) % 8, (p[1] + 2 * i + 5) % 8);
                     if (HasPath(symmetricpath))
                     {
                         symmetricpathcount++;
@@ -157,6 +174,13 @@ public class Tile {
         testPaths4.Add(new Vector2Int(6, 7));
         Tile t4 = new Tile(testPaths4);
 
+        List<Vector2Int> testPaths5 = new List<Vector2Int>();
+        testPaths5.Add(new Vector2Int(0, 3));
+        testPaths5.Add(new Vector2Int(1, 5));
+        testPaths5.Add(new Vector2Int(2, 6));
+        testPaths5.Add(new Vector2Int(4, 7));
+        Tile t5 = new Tile(testPaths5);
+
         Debug.Assert (t.getRotatedCoordinate (0, Direction.RIGHT) == 2, "Basic Coordinate Rotation");
 		Debug.Assert (t.getRotatedCoordinate (7, Direction.RIGHT) == 1, "Coordinate rotation overflow");
 		Vector2Int p = new Vector2Int (0, 5);
@@ -174,5 +198,6 @@ public class Tile {
         Debug.Assert(t.SymmetryScore() == 0);
         Debug.Assert(t3.SymmetryScore() == 2);
         Debug.Assert(t4.SymmetryScore() == 3);
+        Debug.Log(t5.SymmetryScore());
     }
 }

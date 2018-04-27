@@ -21,6 +21,7 @@ public class Main : MonoBehaviour {
 		Administrator.Tests ();
         PlayerLocation.Tests();
         Player.Tests();
+        PlayerMachine.Tests(); 
         
 	}
 }
