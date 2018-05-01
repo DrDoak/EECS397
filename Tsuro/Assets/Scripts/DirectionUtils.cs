@@ -1,8 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.TestTools;
-using NUnit.Framework;
 
 
 public enum Direction { UP, RIGHT, DOWN, LEFT , NONE}
