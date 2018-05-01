@@ -1,16 +1,44 @@
-﻿using System.Collections;
+﻿using UnityEngine;
+using UnityEditor;
+using UnityEngine.TestTools;
+using NUnit.Framework;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class TestPlayerMachine : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-		
+	[Test]
+	public void ChooseRandomTileTests() {
+
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+
+	[Test]
+	public void PlacePawnTest() {
+
+	}
+
+	[Test]
+	public void PlayTurnTest() {
+
+	}
+
+	[Test]
+	public void IsSymmetricTests() {
+
+	}
+
+	[Test]
+	public void ChooseSymmetricTest() {
+
+	}
+
+	[Test]
+	public void ChooseAntiSymmetricTest() {
+
+	}
+
+	[Test]
+	public void EndGameTest() {
+
 	}
 }
