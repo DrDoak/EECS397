@@ -7,6 +7,7 @@ using System.Collections.Generic;
 
 public class TestTile {
 
+	//Tiles 0 and 1 are identical, except one of the paths has the input flipped.
 	public static List<Tile> GenerateTiles() {
 		List<Tile> tList = new List<Tile> ();
 		List<Vector2Int> testPaths = new List<Vector2Int> ();
@@ -18,7 +19,7 @@ public class TestTile {
 		tList.Add (t);
 
 		List<Vector2Int> testPaths2 = new List<Vector2Int>();
-		testPaths2.Add(new Vector2Int(0, 5));
+		testPaths2.Add(new Vector2Int(5, 0));
 		testPaths2.Add(new Vector2Int(1, 3));
 		testPaths2.Add(new Vector2Int(2, 6));
 		testPaths2.Add(new Vector2Int(4, 7));
@@ -90,6 +91,17 @@ public class TestTile {
 		Assert.AreEqual (1, testTiles[0].GetPathConnection (7),  "Sent valid path");
 		Assert.AreEqual (new Vector2Int(4,7), testTiles[0].OriginalPaths[3],  "Original paths preserved");
 
+	}
+
+	[Test]
+	public void HasPath() {
+		List<Tile> testTiles = GenerateTiles ();
+
+		Assert.True(testTiles[0].HasOriginalPath(new Vector2Int(0,5)), "Tile shown to have path.");
+		testTiles [1].SetRotation (Direction.DOWN);
+		Assert.True(testTiles[0].HasOriginalPath(new Vector2Int(0,5)),  "tiles still has path after rotation");
+		Assert.True(testTiles[0].HasOriginalPath(new Vector2Int(5,0)),  "tiles identifies flipped but same path");
+		Assert.False(testTiles[0].HasOriginalPath(new Vector2Int(0,4)),  "tiles identifies when it doesn't have a path");
 	}
 
 	[Test]

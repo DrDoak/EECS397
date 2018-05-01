@@ -18,6 +18,7 @@ public class PlayerMachine : Player {
 
     public override PlayerLocation PlacePawn(Board b)
     {
+		//while (!(b.AddNewPlayer()))
         return base.PlacePawn(b);
     }
 
@@ -36,20 +37,65 @@ public class PlayerMachine : Player {
 
     }
 
-    //private Tile ChooseSymmetricTile (Hand h)
-    //{
-    //    ;
-    //}
+   /* private Tile ChooseSymmetricTile (Hand h)
+    {
+ 
+    }
 
     //private Tile ChooseAsymmetricTile (Hand h)
     //{
     //    ;
-    //}
+    //}*/
 
     public override void EndGame(Board b, List<Color> player_colors)
     {
         base.EndGame(b, player_colors);
     }
+
+	public int SymmetryScore(Tile t)
+	{
+		int symmetricpathcount = 0;
+
+		foreach (Vector2Int p in t.OriginalPaths)
+		{
+			int difference = ((p[1] - p[0]) % 8); 
+			if (difference == 4)
+			{
+				for (int i = 1; i < 4; i++)
+				{
+					Vector2Int symmetricpath = new Vector2Int((p[0] + i) % 8, (p[1] + i) % 8);
+					if (t.HasOriginalPath(symmetricpath))
+					{
+						symmetricpathcount++;
+					}
+				}
+			}
+			else if ((difference % 2) == 0)
+			{
+				for (int i = 0; i < 4; i++)
+				{
+					Vector2Int symmetricpath = new Vector2Int((p[0] + 2*i + 1) % 8, (p[1] + 2 * i + 1) % 8);
+					if (t.HasOriginalPath(symmetricpath))
+					{
+						symmetricpathcount++;
+					}
+				}
+			}
+			else if ((difference % 2) == 1)
+			{
+				for (int i = 1; i < 4; i++)
+				{
+					Vector2Int symmetricpath = new Vector2Int((p[0] + 2 * i) % 8, (p[1] + 2 * i) % 8);
+					if (t.HasOriginalPath(symmetricpath))
+					{
+						symmetricpathcount++;
+					}
+				}
+			}
+
+		}
+		return ((int) Mathf.Sqrt(symmetricpathcount));
+	}
 
 
 }

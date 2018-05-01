@@ -5,10 +5,9 @@ using UnityEngine;
 public class Player
 {
 
-    protected string Name;
+	protected string Name = "Player Name";
     protected Color PawnColor;
-    protected static List<Color> AllPlayerColors = new List<Color>()
-    { Color.red, Color.blue, Color.green, Color.yellow, Color.cyan, Color.magenta, Color.black, Color.white};
+	public readonly static List<Color> AllPlayerColors = new List<Color>() { Color.red, Color.blue, Color.green, Color.yellow, Color.cyan, Color.magenta, Color.black, Color.white};
     protected Vector2Int Coordinate;
     protected int Position;
 
@@ -19,7 +18,6 @@ public class Player
 
     public virtual string GetName()
     {
-        Name = "Player Name";
         return Name;
     }
 
@@ -42,7 +40,6 @@ public class Player
         int defaultpos = 6;
         PlayerLocation pl = new PlayerLocation(defaultcoord, defaultpos);
         return pl;
-
     }
 
     public virtual Tile PlayTurn(Board b, Hand h, int drawdeckcount)
@@ -57,19 +54,5 @@ public class Player
         {
             Debug.Log(player_colors[i] + " is a winner!");
         }
-    }
-
-    public static void Tests()
-    {
-        Debug.Log("Running Tests in Player");
-        Player p = new Player("John");
-
-        Debug.Assert(p.GetName() == "John", "GetName returns correct name");
-
-        List<Color> playercolorlist = new List<Color>();
-        Debug.Assert(!playercolorlist.Contains(Color.red), "Red is not yet in Player color list."); 
-        p.Initialize(AllPlayerColors[0], playercolorlist);
-        Debug.Assert(playercolorlist.Contains(Color.red), "Red is now in Player color list.");
-
     }
 }

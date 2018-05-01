@@ -23,8 +23,8 @@ public class TestDeck {
 		SPlayer p2 = new SPlayer();
 		Deck fullDeck = new Deck();
 
-		b.AddNewPlayer(p1, new Vector2Int(0, 0), 7);
-		b.AddNewPlayer(p2, new Vector2Int(0, 0), 6);
+		b.AddNewPlayer(p1,  new PlayerLocation( new Vector2Int(0, 0), 7));
+		b.AddNewPlayer(p2, new PlayerLocation( new Vector2Int(0, 0), 6));
 		Assert.AreEqual(3, p1.MyHand.Pieces.Count,  "Cards added to player hand");
 		Assert.AreEqual(29, b.CurrentDeck.DrawDeck.Count, "Cards removed from deck");
 
@@ -40,9 +40,9 @@ public class TestDeck {
 		SPlayer p1 = new SPlayer();
 		SPlayer p2 = new SPlayer();
 		SPlayer p3 = new SPlayer ();
-		b.AddNewPlayer (p1, new Vector2Int (0, 0), 7);
-		b.AddNewPlayer (p2, new Vector2Int (0, 0), 4);
-		b.AddNewPlayer (p3, new Vector2Int (0, 0), 5);
+		b.AddNewPlayer (p1, new PlayerLocation( new Vector2Int (0, 0), 7));
+		b.AddNewPlayer (p2,  new PlayerLocation(new Vector2Int (0, 0), 4));
+		b.AddNewPlayer (p3,  new PlayerLocation(new Vector2Int (0, 0), 5));
 
 		Debug.Assert (b.CurrentDeck.DragonTileHand == null, "No player has Dragon tile beforehand");
 
@@ -65,9 +65,9 @@ public class TestDeck {
 		SPlayer p1 = new SPlayer();
 		SPlayer p2 = new SPlayer();
 		SPlayer p3 = new SPlayer ();
-		b.AddNewPlayer (p1, new Vector2Int (0, 0), 7);
-		b.AddNewPlayer (p2, new Vector2Int (0, 0), 4);
-		b.AddNewPlayer (p3, new Vector2Int (0, 5), 7);
+		b.AddNewPlayer (p1,  new PlayerLocation(new Vector2Int (0, 0), 7));
+		b.AddNewPlayer (p2,  new PlayerLocation(new Vector2Int (0, 0), 4));
+		b.AddNewPlayer (p3,  new PlayerLocation(new Vector2Int (0, 5), 7));
 		while (b.CurrentDeck.DrawDeck.Count > 0) {
 			b.CurrentDeck.DrawCard (p2.MyHand);
 		}
@@ -92,9 +92,9 @@ public class TestDeck {
 		SPlayer p1 = new SPlayer();
 		SPlayer p2 = new SPlayer();
 		SPlayer p3 = new SPlayer ();
-		b.AddNewPlayer (p1, new Vector2Int (0, 0), 7);
-		b.AddNewPlayer (p2, new Vector2Int (0, 0), 4);
-		b.AddNewPlayer (p3, new Vector2Int (0, 5), 7);
+		b.AddNewPlayer (p1,  new PlayerLocation(new Vector2Int (0, 0), 7));
+		b.AddNewPlayer (p2,  new PlayerLocation(new Vector2Int (0, 0), 4));
+		b.AddNewPlayer (p3,  new PlayerLocation(new Vector2Int (0, 5), 7));
 		while (b.CurrentDeck.DrawDeck.Count > 0) {
 			b.CurrentDeck.DrawCard (p1.MyHand);
 		}
@@ -124,9 +124,9 @@ public class TestDeck {
 		SPlayer p1 = new SPlayer();
 		SPlayer p2 = new SPlayer();
 		SPlayer p3 = new SPlayer ();
-		b.AddNewPlayer (p1, new Vector2Int (0, 0), 4);
-		b.AddNewPlayer (p2, new Vector2Int (0, 0), 7);
-		b.AddNewPlayer (p3, new Vector2Int (0, 5), 7);
+		b.AddNewPlayer (p1,  new PlayerLocation(new Vector2Int (0, 0), 4));
+		b.AddNewPlayer (p2,  new PlayerLocation(new Vector2Int (0, 0), 7));
+		b.AddNewPlayer (p3, new PlayerLocation( new Vector2Int (0, 5), 7));
 		while (b.CurrentDeck.DrawDeck.Count > 0) {
 			b.CurrentDeck.DrawCard (p1.MyHand);
 		}

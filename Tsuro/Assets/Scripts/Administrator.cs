@@ -4,9 +4,10 @@ using UnityEngine;
 
 
 public class Administrator {
-    
+	List<Player> m_players;
+
     public bool LegalPlay (SPlayer sp, Board b, Tile t) {
-		if (!(t.Coordinate == sp.Coordinate)) {
+		if (!(t.Coordinate == sp.Location.Coordinate)) {
 			return false;
 		}
         if (!(sp.MyHand.IsInHand(t)))
@@ -25,7 +26,7 @@ public class Administrator {
         foreach (Tile t in sp.MyHand.Pieces)
         {
 			Tile tempT = new Tile(t.OriginalPaths);
-			tempT.SetCoordinate (sp.Coordinate);
+			tempT.SetCoordinate (sp.Location.Coordinate);
             for (int i = 0; i < 4; i++)
             {
 				tempT.SetRotation((Direction)i);
@@ -57,6 +58,10 @@ public class Administrator {
 		to.ContinueGame = (PlayersIn.Count > 1);
         return to;
     }
+
+	public void AddNewPlayer(Player p, PlayerLocation pl) {
+		SPlayer newSPlayer = new SPlayer ();
+	}
 }
 
 public class TurnOutput

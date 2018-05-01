@@ -33,8 +33,8 @@ public class TestSplayer {
 		Tile t = new Tile (testPaths);
 
 		SPlayer p = new SPlayer ();
-		p.MoveToPosition (new Vector2Int(2,3), 7);
+		p.MoveToPosition (new PlayerLocation(new Vector2Int(2,3), 7));
 		Assert.True (p.IsOnEdge (new Vector2Int(2,3), Direction.LEFT), "Detected Correct Direction");
-		Assert.True (p.IsAtPosition (new Vector2Int(2,3), 7), "Detected Correct Position");
+		Assert.True (p.IsAtPosition (new PlayerLocation(new Vector2Int(2,3), 7)), "Detected Correct Position");
 	}
 }

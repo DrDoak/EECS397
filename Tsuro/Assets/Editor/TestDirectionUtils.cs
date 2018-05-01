@@ -33,7 +33,7 @@ public class TestDirectionUtils {
 		testPaths.Add (new Vector2Int (4, 7));
 		Tile t = new Tile (testPaths);
 		SPlayer p = new SPlayer ();
-		p.MoveToPosition (t.Coordinate, 7);
+		p.MoveToPosition (new PlayerLocation(t.Coordinate, 7));
 		Assert.True (p.IsOnEdge (t.Coordinate, Direction.LEFT), "Detected Correct Direction");
 	}
 

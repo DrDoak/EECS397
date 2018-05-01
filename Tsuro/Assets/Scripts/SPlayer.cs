@@ -5,10 +5,9 @@ using UnityEngine;
 public class SPlayer {
 
     public Hand MyHand { get; private set; }
-    public int PositionOnTile { get; private set; }
+	public PlayerLocation Location { get; private set; }
 
-	private Color m_color;
-	public Vector2Int Coordinate;
+	public Color PieceColor { get; private set; }
 
 	public SPlayer() {
 		MyHand = new Hand ();
@@ -21,16 +20,15 @@ public class SPlayer {
 
 	public bool IsOnEdge (Vector2Int coord, Direction d)
     {
-		return (Coordinate == coord && DirectionUtils.DirectionMatch (d, PositionOnTile));
+		return (Location.Coordinate == coord && DirectionUtils.DirectionMatch (d, Location.PositionOnTile));
     }
 
-	public bool IsAtPosition (Vector2Int coord, int pos)
+	public bool IsAtPosition (PlayerLocation pl)
 	{
-		return (Coordinate == coord && PositionOnTile == pos);
+		return Location.Equals (pl);
 	}
 
-	public void MoveToPosition(Vector2Int pos , int tilePos) {
-		Coordinate = pos;
-		PositionOnTile = tilePos;
+	public void MoveToPosition(PlayerLocation pl) {
+		Location = new PlayerLocation (pl.Coordinate, pl.PositionOnTile);
 	}
 }
