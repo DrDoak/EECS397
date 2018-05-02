@@ -39,7 +39,7 @@ public class PlayerMachine : Player {
 				}
 			}
 			pl = new PlayerLocation(coord, positionOnTile);
-		} while(b.PlayerOccupied(pl));
+		} while(b.GetPlayersAtLocation(pl).Count > 0);
         return pl;
     }
 
@@ -74,8 +74,10 @@ public class PlayerMachine : Player {
 
 	private Tile ChooseRandomTile(List<Tile> legalTiles)
     {
-		Tile t = legalTiles[Random.Range(0, legalTiles.Count)];
-		Direction d = t.LegalDirections[Random.Range(0, t.LegalDirections.Count)];
+		if (legalTiles.Count == 0)
+			Debug.Log ("Why don't I have tiles?");
+		Tile t = legalTiles[Random.Range(0, legalTiles.Count - 1)];
+		Direction d = t.LegalDirections[Random.Range(0, t.LegalDirections.Count - 1)];
         t.SetRotation(d);
         return t;
     }
@@ -92,14 +94,13 @@ public class PlayerMachine : Player {
 				maxScore = sc;
 			}
 		}
-		Direction d = bestTile.LegalDirections[Random.Range(0, bestTile.LegalDirections.Count)];
+		Direction d = bestTile.LegalDirections[Random.Range(0, bestTile.LegalDirections.Count - 1)];
 		bestTile.SetRotation(d);
 		return bestTile;
     }
 	//Make sure it is a legal play first
 	private Tile ChooseSymmetricTile (List<Tile> legalTiles)
     {
-		Debug.Log (legalTiles.Count);
 		int minScore = int.MaxValue;
 		Tile bestTile = legalTiles[0];
 		foreach (Tile t in legalTiles) {
@@ -109,7 +110,7 @@ public class PlayerMachine : Player {
 				minScore = sc;
 			}
 		}
-		Direction d = bestTile.LegalDirections[Random.Range(0, bestTile.LegalDirections.Count)];
+		Direction d = bestTile.LegalDirections[Random.Range(0, bestTile.LegalDirections.Count - 1)];
 		bestTile.SetRotation(d);
 		return bestTile;
     }

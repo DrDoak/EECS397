@@ -66,8 +66,10 @@ public class Administrator {
 		foreach (SPlayer sp in eliminatedPlayers) {
 			b.RemovePlayer (sp);
 		}
-		if (ActivePlayer.MyHand.Pieces.Count < 3)
+		if (ActivePlayer.MyHand.Pieces.Count < 3) {
 			b.CurrentDeck.DrawCard (ActivePlayer.MyHand);
+			Debug.Log (ActivePlayer.MyPlayer.GetName () + " has: " + ActivePlayer.MyHand.Pieces.Count);
+		}
 		to.DrawPile = b.CurrentDeck.DrawDeck;
 		to.PlayersIn = b.CurrentPlayersIn;
 		to.PlayersOut = b.CurrentPlayersOut;
@@ -102,7 +104,17 @@ public class Administrator {
 			SPlayer currentSPlayer = GetNextPlayer (m_board.CurrentPlayersIn);
 
 			Player p = currentSPlayer.MyPlayer;
-			Tile t = p.PlayTurn (m_board, GetLegalTiles(currentSPlayer), m_board.CurrentDeck.DrawDeck.Count);
+			List<Tile> legalTiles = GetLegalTiles (currentSPlayer);
+			if (legalTiles.Count == 0)
+				legalTiles = currentSPlayer.MyHand.Pieces;
+			if (legalTiles.Count == 0) {
+				Debug.Log ("BUG, " + p.GetName() + " should have tiles: ");
+				Debug.Log ("Deck: " + m_board.CurrentDeck.DrawDeck.Count);
+				foreach( SPlayer pl in Players) {
+					Debug.Log(pl.MyPlayer.GetName() + " has: " + pl.MyHand.Pieces.Count + " is in?: " + m_board.CurrentPlayersIn.Contains(pl));
+				}
+			}
+			Tile t = p.PlayTurn (m_board, legalTiles, m_board.CurrentDeck.DrawDeck.Count);
 
 			t.SetCoordinate( currentSPlayer.Location.Coordinate);
 			currentSPlayer.MyHand.RemoveFromHand (t);

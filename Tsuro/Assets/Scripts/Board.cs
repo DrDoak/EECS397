@@ -18,11 +18,11 @@ public class Board {
 		CurrentDeck = new Deck();
 	}
 
-	public bool AddNewPlayer(SPlayer sp, PlayerLocation pl) { 
-		if (pl.IsEdgePosition(BoardSize) &&
-			getCollisionPlayer (sp , pl) == null) {
+	public bool AddNewPlayer(SPlayer sp, PlayerLocation ploc) { 
+		if (ploc.IsEdgePosition(BoardSize) &&
+			GetPlayersAtLocation (ploc, sp).Count == 0) {
 			CurrentPlayersIn.Add(sp);
-			sp.MoveToPosition(pl);
+			sp.MoveToPosition(ploc);
 			CurrentDeck.OnPlayerAdd (sp.MyHand, CurrentPlayersIn);
 			return true;
 		}
@@ -61,11 +61,11 @@ public class Board {
 		PlayerLocation newLoc = new PlayerLocation (newCoord, newPos);
 
 		sp.MoveToPosition (newLoc);
-		SPlayer colP = getCollisionPlayer (sp,newLoc);
+		List<SPlayer> colP = GetPlayersAtLocation (newLoc,sp);
 
-		if (colP != null) {
+		if (colP.Count > 0) {
 			playersEliminated.Add (sp);
-			playersEliminated.Add (colP);
+			playersEliminated.AddRange (colP);
 		}
 		if (!isPositionInBoard (newCoord)) {
 			playersEliminated.Add (sp);
@@ -92,7 +92,7 @@ public class Board {
 		int newPos = DirectionUtils.AdjacentPosition (positionAfterPath);
 		PlayerLocation pl = new PlayerLocation (newCoord, newPos);
 
-		if (!isPositionInBoard (newCoord) || getCollisionPlayer (sp, pl) != null)
+		if (!isPositionInBoard (newCoord) || GetPlayersAtLocation (pl,sp).Count > 0)
 			return true;
 		
 		if (m_placedTiles.ContainsKey (newCoord))
@@ -114,21 +114,15 @@ public class Board {
 		return pList;
 	}
 
-	private SPlayer getCollisionPlayer(SPlayer ignorePlayer, PlayerLocation pl) {
+	public List<SPlayer> GetPlayersAtLocation(PlayerLocation pl, SPlayer ignorePlayer = null) {
+		List<SPlayer> sp = new List<SPlayer> ();
 		foreach (SPlayer p in CurrentPlayersIn) {
 			if (p != ignorePlayer && p.IsAtPosition (pl))
-				return p;
+				sp.Add (p);
 		}
-		return null;
+		return sp;
 	}
 
-	public bool PlayerOccupied( PlayerLocation pl) {
-		foreach (SPlayer p in CurrentPlayersIn) {
-			if (p.IsAtPosition (pl))
-				return true;
-		}
-		return false;
-	}
 	private bool isPositionInBoard (Vector2Int coord) {
 		return (coord.x >= 0 && coord.x < BoardSize.x 
 			&& coord.y >= 0 && coord.y < BoardSize.y);

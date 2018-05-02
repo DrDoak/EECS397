@@ -32,7 +32,6 @@ public class SPlayer {
 	}
 
 	public void MoveToPosition(PlayerLocation pl) {
-		Debug.Log ("Moved To coord: " + pl.Coordinate + " from: " + Location.Coordinate);
 		Location = new PlayerLocation (pl.Coordinate, pl.PositionOnTile);
 	}
 }
