@@ -8,7 +8,8 @@ public class Tile {
 	public readonly List<Vector2Int> OriginalPaths;
 
 	private Direction m_rotation;
-	private List<Vector2Int> m_paths;
+	public List<Vector2Int> RotatedPaths { get; private set; }
+	public List<Direction> LegalDirections;
 
 	public Tile(List<Vector2Int> pathList) {
 		if (!isValidPath (pathList)) {
@@ -16,7 +17,8 @@ public class Tile {
 		}
         OriginalPaths = pathList;
 		m_rotation = Direction.UP;
-		m_paths = pathList;
+		RotatedPaths = pathList;
+		LegalDirections = new List<Direction> () { Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT };
 	}
 	public void SetCoordinate(Vector2Int coordinate) {
 		Coordinate = coordinate;
@@ -24,7 +26,7 @@ public class Tile {
 	public override string ToString()
 	{
 		string s = "Rotation: " + m_rotation.ToString() + " Rotated Paths: ";
-		foreach (Vector2Int path in m_paths)
+		foreach (Vector2Int path in RotatedPaths)
 		{
 			s += path.ToString();
 		}
@@ -37,7 +39,7 @@ public class Tile {
 		if (otherTile == null)
 			return false;
 		
-		for (int i = 0; i < m_paths.Count; i++)
+		for (int i = 0; i < RotatedPaths.Count; i++)
 		{
 			if (!HasOriginalPath(otherTile.OriginalPaths[i]))
 				return false;
@@ -48,14 +50,14 @@ public class Tile {
 	public void SetRotation ( Direction r)
     {
 		m_rotation = r;
-		m_paths = new List<Vector2Int> ();
+		RotatedPaths = new List<Vector2Int> ();
 		foreach (Vector2Int p in OriginalPaths) {
-			m_paths.Add(getRotatedPath(p,r));
+			RotatedPaths.Add(getRotatedPath(p,r));
 		}
     }
 
 	public int GetPathConnection(int startPoint) {
-		foreach (Vector2Int v in m_paths) {
+		foreach (Vector2Int v in RotatedPaths) {
 			if (v.x == startPoint)
 				return v.y;
 			if (v.y == startPoint)

@@ -6,10 +6,11 @@ public class Player
 {
 
 	protected string Name = "Player Name";
-    protected Color PawnColor;
-	public readonly static List<Color> AllPlayerColors = new List<Color>() { Color.red, Color.blue, Color.green, Color.yellow, Color.cyan, Color.magenta, Color.black, Color.white};
+	public Color PawnColor;
     protected Vector2Int Coordinate;
     protected int Position;
+	protected Board FinalBoardState;
+	protected List<Player> WinningPlayers;
 
     public Player(string m_name)
     {
@@ -24,14 +25,6 @@ public class Player
     public virtual void Initialize(Color m_color, List<Color> player_colors)
     {
         PawnColor = m_color;
-        if (!player_colors.Contains(m_color))
-        {
-            player_colors.Add(m_color);
-        }
-        else
-        {
-            Debug.LogError("Error: Color has already been added.");
-        }
     }
 
     public virtual PlayerLocation PlacePawn(Board b)
@@ -42,17 +35,18 @@ public class Player
         return pl;
     }
 
-    public virtual Tile PlayTurn(Board b, Hand h, int drawdeckcount)
+	public virtual Tile PlayTurn(Board b, List<Tile> legalTiles, int drawdeckcount)
     {
-        return h.Pieces[0];
+		return legalTiles[0];
     }
 
     public virtual void EndGame(Board b, List<Color> player_colors)
     {
+		FinalBoardState = b;
         int Winners = b.CurrentPlayersIn.Count;
         for (int i = 0; i < Winners; i++)
         {
-            Debug.Log(player_colors[i] + " is a winner!");
+            //Debug.Log(player_colors[i] + " is a winner!");
         }
     }
 }

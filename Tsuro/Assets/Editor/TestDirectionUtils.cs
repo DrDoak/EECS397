@@ -9,7 +9,6 @@ public class TestDirectionUtils {
 
 	[Test]
 	public void DirectionMatch() {
-		Debug.Log ("Running Tests in DirectionUtils");
 
 		List<Vector2Int> testPaths = new List<Vector2Int> ();
 		testPaths.Add (new Vector2Int (0, 5));

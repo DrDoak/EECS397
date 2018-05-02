@@ -8,11 +8,14 @@ public class SPlayer {
 	public PlayerLocation Location { get; private set; }
 
 	public Color PieceColor { get; private set; }
+	public readonly Player MyPlayer;
 
-	public SPlayer() {
+	public SPlayer(Player p = null) {
 		MyHand = new Hand ();
+		MyPlayer = p;
+		Location = new PlayerLocation (new Vector2Int (0, 0), 0);
 	}
-    
+
 	public Tile PlayTile(Tile t) {
 		MyHand.RemoveFromHand (t);
 		return t;
@@ -29,6 +32,7 @@ public class SPlayer {
 	}
 
 	public void MoveToPosition(PlayerLocation pl) {
+		Debug.Log ("Moved To coord: " + pl.Coordinate + " from: " + Location.Coordinate);
 		Location = new PlayerLocation (pl.Coordinate, pl.PositionOnTile);
 	}
 }

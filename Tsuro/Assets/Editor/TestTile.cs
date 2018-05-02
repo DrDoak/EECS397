@@ -35,12 +35,36 @@ public class TestTile {
 		tList.Add (t3);
 
 		List<Vector2Int> testPaths4 = new List<Vector2Int>();
-		testPaths4.Add(new Vector2Int(2, 1));
 		testPaths4.Add(new Vector2Int(0, 3));
-		testPaths4.Add(new Vector2Int(7, 6));
-		testPaths4.Add(new Vector2Int(5, 4));
+		testPaths4.Add(new Vector2Int(1, 2));
+		testPaths4.Add(new Vector2Int(4, 5));
+		testPaths4.Add(new Vector2Int(6, 7));
 		Tile t4 = new Tile(testPaths4);
 		tList.Add (t4);
+
+		List<Vector2Int> testPaths5 = new List<Vector2Int>();
+		testPaths5.Add(new Vector2Int(0, 4));
+		testPaths5.Add(new Vector2Int(1, 5));
+		testPaths5.Add(new Vector2Int(2, 6));
+		testPaths5.Add(new Vector2Int(3, 7));
+		Tile t5 = new Tile(testPaths5);
+		tList.Add (t5);
+
+		List<Vector2Int> testPaths6 = new List<Vector2Int>();
+		testPaths6.Add(new Vector2Int(0, 5));
+		testPaths6.Add(new Vector2Int(1, 4));
+		testPaths6.Add(new Vector2Int(2, 7));
+		testPaths6.Add(new Vector2Int(3, 6));
+		Tile t6 = new Tile(testPaths6);
+		tList.Add (t6);
+
+		List<Vector2Int> testPaths7 = new List<Vector2Int>();
+		testPaths7.Add(new Vector2Int(0, 5));
+		testPaths7.Add(new Vector2Int(1, 4));
+		testPaths7.Add(new Vector2Int(2, 6));
+		testPaths7.Add(new Vector2Int(3, 7));
+		Tile t7 = new Tile(testPaths7);
+		tList.Add (t7);
 
 		return tList;
 	}

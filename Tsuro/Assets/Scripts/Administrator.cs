@@ -4,7 +4,18 @@ using UnityEngine;
 
 
 public class Administrator {
-	List<Player> m_players;
+	public List<Color> AllPlayerColors = new List<Color>() 
+	{ Color.red, Color.blue, Color.green, Color.yellow, Color.cyan, Color.magenta, Color.black, Color.white};
+
+	public List<SPlayer> Players;
+	private List<Color> m_pieceColors;
+	private int m_currentPlayerIndex = 0;
+	private Board m_board;
+
+	public Administrator () {
+		m_pieceColors = new List<Color>();
+		Players = new List<SPlayer> ();
+	}
 
     public bool LegalPlay (SPlayer sp, Board b, Tile t) {
 		if (!(t.Coordinate == sp.Location.Coordinate)) {
@@ -27,16 +38,23 @@ public class Administrator {
         {
 			Tile tempT = new Tile(t.OriginalPaths);
 			tempT.SetCoordinate (sp.Location.Coordinate);
-            for (int i = 0; i < 4; i++)
-            {
-				tempT.SetRotation((Direction)i);
-				if (!b.IsPlayerEliminated (sp, tempT)) {
-                    return true;
-                };
-            }
+			if (LegalTilePlayDirections (sp, tempT, b).Count > 0)
+				return true;
         }  
         return false;
     }
+
+	public List<Direction> LegalTilePlayDirections(SPlayer sp, Tile t, Board b) {
+		List<Direction> LegalDirections = new List<Direction> ();
+		for (int i = 0; i < 4; i++)
+		{
+			t.SetRotation((Direction)i);
+			if (!b.IsPlayerEliminated (sp, t)) {
+				LegalDirections.Add ((Direction)i);
+			}
+		}
+		return LegalDirections;
+	}
 
 	public TurnOutput PlayATurn(List<Tile> DrawPile, List<SPlayer> PlayersIn, List<SPlayer> PlayersOut, Board b, Tile PlacedTile)
     {
@@ -55,13 +73,77 @@ public class Administrator {
 		to.PlayersIn = b.CurrentPlayersIn;
 		to.PlayersOut = b.CurrentPlayersOut;
 		to.b = b;
-		to.ContinueGame = (PlayersIn.Count > 1);
+		to.ContinueGame = (to.PlayersIn.Count > 1);
         return to;
     }
-
-	public void AddNewPlayer(Player p, PlayerLocation pl) {
-		SPlayer newSPlayer = new SPlayer ();
+	public void SetBoard(Board b) {
+		m_board = b;
 	}
+	public void AddNewPlayer(Player p) {
+		SPlayer newSPlayer = new SPlayer (p);
+		m_pieceColors.Add (AllPlayerColors [Players.Count]);
+		Players.Add (newSPlayer);
+	}
+	public void InitializeGame() {
+		int i = 0;
+		foreach (SPlayer splayer in Players) {
+			splayer.MyPlayer.Initialize (m_pieceColors[i],m_pieceColors);
+			i++;
+			PlayerLocation pLocation = splayer.MyPlayer.PlacePawn (m_board);
+			m_board.AddNewPlayer (splayer, pLocation);
+		}
+	}
+	public void Play () {
+		TurnOutput currentTurnStatus = new TurnOutput ();
+		currentTurnStatus.ContinueGame = true;
+		int numTurns = 0;
+		while (currentTurnStatus.ContinueGame) {
+			SPlayer currentSPlayer = m_board.GetNextPlayer (m_board);
+
+			Player p = currentSPlayer.MyPlayer;
+			Tile t = p.PlayTurn (m_board, GetLegalTiles(currentSPlayer), m_board.CurrentDeck.DrawDeck.Count);
+
+			t.SetCoordinate( currentSPlayer.Location.Coordinate);
+			Debug.Log(p.GetName() + " is at position: " + currentSPlayer.Location.Coordinate);
+			currentSPlayer.MyHand.RemoveFromHand (t);
+
+
+			currentTurnStatus = PlayATurn (m_board.CurrentDeck.DrawDeck, m_board.CurrentPlayersIn,
+				m_board.CurrentPlayersOut, m_board, t);
+			
+			p.EndGame(currentTurnStatus.b, playerToColors(currentTurnStatus.PlayersIn));
+
+			numTurns++;
+			if (numTurns > 35) {
+				Debug.Log ("BADBADBADBADBAD: Infinite loop: This is not good : BADBADBADBADBAD");
+				break;
+			}
+			m_board.AdvancePlayerList ();
+		}
+	}
+
+	public List<Tile> GetLegalTiles(SPlayer sp) {
+		List<Tile> legalTiles = new List<Tile> ();
+		foreach (Tile t in sp.MyHand.Pieces) {
+			List<Direction> legalDirs = LegalTilePlayDirections (sp, t, m_board);
+			if (legalDirs.Count > 0) {
+				t.LegalDirections = legalDirs;
+				legalTiles.Add (t);
+			}
+		}
+		return legalTiles;
+	}
+
+	private List<Color> playerToColors(List<SPlayer> playerList) {
+		//var res = m_playerMap.GroupBy(p => p.Value).ToDictionary(g => g.Key, g => g.Select(pp => pp.Key).ToList());
+		var colorList = new List<Color> ();
+		foreach (SPlayer p in playerList) {
+			colorList.Add(p.MyPlayer.PawnColor);
+		}
+		return colorList;
+	}
+
+
 }
 
 public class TurnOutput

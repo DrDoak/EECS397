@@ -6,12 +6,12 @@ public class Board {
 
     public List<SPlayer> CurrentPlayersIn;
     public List<SPlayer> CurrentPlayersOut;
-	private Vector2Int m_boardSize;
+	public readonly Vector2Int BoardSize;
 	private Dictionary<Vector2Int,Tile> m_placedTiles;
     public readonly Deck CurrentDeck;
 
 	public Board (Vector2Int size) {
-		m_boardSize = size;
+		BoardSize = size;
 		m_placedTiles = new Dictionary<Vector2Int,Tile> ();
 		CurrentPlayersIn = new List<SPlayer>();
 		CurrentPlayersOut = new List<SPlayer> ();
@@ -19,7 +19,7 @@ public class Board {
 	}
 
 	public bool AddNewPlayer(SPlayer sp, PlayerLocation pl) { 
-		if (pl.IsEdgePosition(m_boardSize) &&
+		if (pl.IsEdgePosition(BoardSize) &&
 			getCollisionPlayer (sp , pl) == null) {
 			CurrentPlayersIn.Add(sp);
 			sp.MoveToPosition(pl);
@@ -28,11 +28,14 @@ public class Board {
 		}
 		return false;
 	}
-
-	public void AdvanceTurns(List<SPlayer> PlayersIn)
+	public SPlayer GetNextPlayer(Board b) {
+		return b.CurrentPlayersIn[0];
+	}
+	public void AdvancePlayerList()
 	{
-		PlayersIn.Remove(PlayersIn[0]);
-		PlayersIn.Add(PlayersIn[0]);
+		SPlayer temp = CurrentPlayersIn [0];
+		CurrentPlayersIn.Remove(temp);
+		CurrentPlayersIn.Add(temp);
 	}
 
 	public void RemovePlayer(SPlayer p)
@@ -128,8 +131,15 @@ public class Board {
 		return null;
 	}
 
+	public bool PlayerOccupied( PlayerLocation pl) {
+		foreach (SPlayer p in CurrentPlayersIn) {
+			if (p.IsAtPosition (pl))
+				return true;
+		}
+		return false;
+	}
 	private bool isPositionInBoard (Vector2Int coord) {
-		return (coord.x >= 0 && coord.x < m_boardSize.x 
-			&& coord.y >= 0 && coord.y < m_boardSize.y);
+		return (coord.x >= 0 && coord.x < BoardSize.x 
+			&& coord.y >= 0 && coord.y < BoardSize.y);
 	}
 }

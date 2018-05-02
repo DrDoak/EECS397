@@ -2,100 +2,132 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum PlayerAIType { RANDOM, SYMMETRIC, ASYMMETRIC}
+
 public class PlayerMachine : Player {
 
     public PlayerMachine(string m_name) : base(m_name) { }
+	public PlayerAIType AIType = PlayerAIType.RANDOM;
+	public Administrator Admin;
 
     public override string GetName()
     {
         return base.GetName();
     }
 
-    public override void Initialize(Color m_color, List<Color> player_colors)
-    {
-        base.Initialize(m_color, player_colors);
-    }
-
     public override PlayerLocation PlacePawn(Board b)
     {
-		//while (!(b.AddNewPlayer()))
-        return base.PlacePawn(b);
+		PlayerLocation pl = new PlayerLocation (new Vector2Int(0,0),0);
+		do {
+			Vector2Int coord = new Vector2Int(0,0);
+			int positionOnTile = 0;
+			if (Random.Range(1,2) == 1) {
+				coord.x =  (b.BoardSize.x - 1) * Random.Range ((int)0, (int)1);
+				coord.y =  Random.Range(0, b.BoardSize.y - 1);
+				if (coord.x == 0) {
+					positionOnTile = randomIntAlongDirection(Direction.LEFT);
+				} else {
+					positionOnTile = randomIntAlongDirection(Direction.RIGHT);
+				}
+			} else {
+				coord.y =  (b.BoardSize.y - 1) * Random.Range ((int)0, (int)1);
+				coord.x =  Random.Range(0, b.BoardSize.x - 1);
+				if (coord.y == 0) {
+					positionOnTile = randomIntAlongDirection(Direction.DOWN);
+				} else {
+					positionOnTile = randomIntAlongDirection(Direction.UP);
+				}
+			}
+			pl = new PlayerLocation(coord, positionOnTile);
+		} while(b.PlayerOccupied(pl));
+        return pl;
     }
 
-    public override Tile PlayTurn(Board b, Hand h, int drawdeckcount)
-    {
-        return base.PlayTurn(b, h, drawdeckcount);
+	private int randomIntAlongDirection( Direction d) {
+		switch (d) {
+		case Direction.UP:
+			return Random.Range((int)0,(int)1);
+		case Direction.RIGHT:
+			return Random.Range((int)2,(int)3);
+		case Direction.DOWN:
+			return Random.Range((int)4,(int)5);
+		case Direction.LEFT:
+			return Random.Range((int)6,(int)7);
+		default:
+			throw new System.ArgumentException ();
+			return 0;
+		}
+	}
+	public override Tile PlayTurn(Board b, List<Tile> legalTiles, int drawdeckcount)
+	{
+		switch (AIType) {
+		case (PlayerAIType.RANDOM):
+			return ChooseRandomTile (legalTiles);
+		case(PlayerAIType.SYMMETRIC):
+			return ChooseSymmetricTile (legalTiles);
+		case(PlayerAIType.ASYMMETRIC):
+			return ChooseAsymmetricTile(legalTiles);
+		default:
+			return legalTiles [0];
+		}
     }
 
-    private Tile ChooseRandomTile(Hand h)
+	private Tile ChooseRandomTile(List<Tile> legalTiles)
     {
-        Tile t = h.Pieces[Random.Range(0, h.Pieces.Count)];
-        Direction d = (Direction)Random.Range(0, 4);
+		Tile t = legalTiles[Random.Range(0, legalTiles.Count)];
+		Direction d = t.LegalDirections[Random.Range(0, t.LegalDirections.Count)];
         t.SetRotation(d);
-
         return t;
-
     }
 
-   /* private Tile ChooseSymmetricTile (Hand h)
+	//Make sure it is a legal play first
+	private Tile ChooseAsymmetricTile (List<Tile> legalTiles)
     {
- 
+		int maxScore = int.MinValue;
+		Tile bestTile = legalTiles [0];
+		foreach (Tile t in legalTiles) {
+			int sc = UniqueRotationTiles (t);
+			if (sc > maxScore) {
+				bestTile = t;
+				maxScore = sc;
+			}
+		}
+		Direction d = bestTile.LegalDirections[Random.Range(0, bestTile.LegalDirections.Count)];
+		bestTile.SetRotation(d);
+		return bestTile;
     }
-
-    //private Tile ChooseAsymmetricTile (Hand h)
-    //{
-    //    ;
-    //}*/
+	//Make sure it is a legal play first
+	private Tile ChooseSymmetricTile (List<Tile> legalTiles)
+    {
+		Debug.Log (legalTiles.Count);
+		int minScore = int.MaxValue;
+		Tile bestTile = legalTiles[0];
+		foreach (Tile t in legalTiles) {
+			int sc = UniqueRotationTiles (t);
+			if (sc < minScore) {
+				bestTile = t;
+				minScore = sc;
+			}
+		}
+		Direction d = bestTile.LegalDirections[Random.Range(0, bestTile.LegalDirections.Count)];
+		bestTile.SetRotation(d);
+		return bestTile;
+    }
 
     public override void EndGame(Board b, List<Color> player_colors)
     {
         base.EndGame(b, player_colors);
     }
 
-	public int SymmetryScore(Tile t)
-	{
-		int symmetricpathcount = 0;
-
-		foreach (Vector2Int p in t.OriginalPaths)
-		{
-			int difference = ((p[1] - p[0]) % 8); 
-			if (difference == 4)
-			{
-				for (int i = 1; i < 4; i++)
-				{
-					Vector2Int symmetricpath = new Vector2Int((p[0] + i) % 8, (p[1] + i) % 8);
-					if (t.HasOriginalPath(symmetricpath))
-					{
-						symmetricpathcount++;
-					}
-				}
-			}
-			else if ((difference % 2) == 0)
-			{
-				for (int i = 0; i < 4; i++)
-				{
-					Vector2Int symmetricpath = new Vector2Int((p[0] + 2*i + 1) % 8, (p[1] + 2 * i + 1) % 8);
-					if (t.HasOriginalPath(symmetricpath))
-					{
-						symmetricpathcount++;
-					}
-				}
-			}
-			else if ((difference % 2) == 1)
-			{
-				for (int i = 1; i < 4; i++)
-				{
-					Vector2Int symmetricpath = new Vector2Int((p[0] + 2 * i) % 8, (p[1] + 2 * i) % 8);
-					if (t.HasOriginalPath(symmetricpath))
-					{
-						symmetricpathcount++;
-					}
-				}
-			}
-
+	public int UniqueRotationTiles(Tile t) {
+		List<Tile> uniqueTiles = new List<Tile> ();
+		uniqueTiles.Add (t);
+		for (int i = 0; i < 4; i++) {
+			t.SetRotation ((Direction)i);
+			Tile compareTile = new Tile (t.RotatedPaths);
+			if (!uniqueTiles.Contains (compareTile))
+				uniqueTiles.Add (compareTile);
 		}
-		return ((int) Mathf.Sqrt(symmetricpathcount));
+		return uniqueTiles.Count;
 	}
-
-
 }
