@@ -62,18 +62,18 @@ public class Administrator {
 		List<SPlayer> eliminatedPlayers = new List<SPlayer> ();
 		foreach (SPlayer p in b.GetAdjacentPlayers(PlacedTile))
 			eliminatedPlayers.AddRange(b.MovePlayer (p, PlacedTile));
-
+		b.PlaceTile (PlacedTile);
 		foreach (SPlayer sp in eliminatedPlayers) {
 			b.RemovePlayer (sp);
 		}
-		if (ActivePlayer.MyHand.Pieces.Count < 3) {
-			b.CurrentDeck.DrawCard (ActivePlayer.MyHand);
-			Debug.Log (ActivePlayer.MyPlayer.GetName () + " has: " + ActivePlayer.MyHand.Pieces.Count);
-		}
-		to.DrawPile = b.CurrentDeck.DrawDeck;
 		to.PlayersIn = b.CurrentPlayersIn;
 		to.PlayersOut = b.CurrentPlayersOut;
 		to.b = b;
+		if (b.CurrentPlayersIn.Contains(ActivePlayer) && ActivePlayer.MyHand.Pieces.Count < 3) {
+			b.CurrentDeck.DrawCard (ActivePlayer.MyHand);
+			//Debug.Log (ActivePlayer.MyPlayer.GetName () + " has: " + ActivePlayer.MyHand.Pieces.Count);
+		}
+		to.DrawPile = b.CurrentDeck.DrawDeck;
 		to.ContinueGame = (to.PlayersIn.Count > 1);
         return to;
     }
@@ -110,6 +110,8 @@ public class Administrator {
 			if (legalTiles.Count == 0) {
 				Debug.Log ("BUG, " + p.GetName() + " should have tiles: ");
 				Debug.Log ("Deck: " + m_board.CurrentDeck.DrawDeck.Count);
+				Debug.Log ("Board: " + m_board.m_placedTiles.Keys.Count);
+
 				foreach( SPlayer pl in Players) {
 					Debug.Log(pl.MyPlayer.GetName() + " has: " + pl.MyHand.Pieces.Count + " is in?: " + m_board.CurrentPlayersIn.Contains(pl));
 				}
@@ -121,8 +123,8 @@ public class Administrator {
 
 			currentTurnStatus = PlayATurn (m_board.CurrentDeck.DrawDeck, m_board.CurrentPlayersIn,
 				m_board.CurrentPlayersOut, m_board, t);
-			
 			p.EndGame(currentTurnStatus.b, playerToColors(currentTurnStatus.PlayersIn));
+			m_board.AdvancePlayers ();
 		}
 	}
 	public SPlayer GetNextPlayer(List<SPlayer> playersIn) {

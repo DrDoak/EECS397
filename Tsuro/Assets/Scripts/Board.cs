@@ -7,7 +7,7 @@ public class Board {
     public List<SPlayer> CurrentPlayersIn;
     public List<SPlayer> CurrentPlayersOut;
 	public readonly Vector2Int BoardSize;
-	private Dictionary<Vector2Int,Tile> m_placedTiles;
+	public Dictionary<Vector2Int,Tile> m_placedTiles;
     public readonly Deck CurrentDeck;
 
 	public Board (Vector2Int size) {
@@ -47,6 +47,14 @@ public class Board {
 		t.SetRotation (rotation);
 		return t;
     }
+	public Tile PlaceTile(Tile t) {
+		if (!isPositionInBoard (t.Coordinate))
+			return null;
+		if (m_placedTiles.ContainsKey (t.Coordinate))
+			return null;
+		m_placedTiles [t.Coordinate] = t;
+		return t;
+	}
 
 	public List<SPlayer> MovePlayer(SPlayer sp, Tile t)
     {
@@ -126,5 +134,13 @@ public class Board {
 	private bool isPositionInBoard (Vector2Int coord) {
 		return (coord.x >= 0 && coord.x < BoardSize.x 
 			&& coord.y >= 0 && coord.y < BoardSize.y);
+	}
+
+	public void AdvancePlayers() {
+		if (CurrentPlayersIn.Count > 0) {
+			SPlayer temp = CurrentPlayersIn [0];
+			CurrentPlayersIn.Remove (temp);
+			CurrentPlayersIn.Add (temp);
+		}
 	}
 }

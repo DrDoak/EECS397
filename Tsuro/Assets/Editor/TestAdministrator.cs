@@ -150,8 +150,10 @@ public class TestAdministrator {
 		PlayerMachine pm = new PlayerMachine ("testPlayer1");
 		a.AddNewPlayer (pm);
 		PlayerMachine pm2 = new PlayerMachine ("testPlayer2");
+		pm2.AIType = PlayerAIType.ASYMMETRIC;
 		a.AddNewPlayer (pm2);
 		PlayerMachine pm3 = new PlayerMachine ("testPlayer3");
+		pm3.AIType = PlayerAIType.SYMMETRIC;
 		a.AddNewPlayer (pm3);
 		PlayerMachine pm4 = new PlayerMachine ("testPlayer4");
 		a.AddNewPlayer (pm4);

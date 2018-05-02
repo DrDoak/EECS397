@@ -107,6 +107,7 @@ public class Deck
 		for (int i = removedIndex; i < OtherPlayersIn.Count; i ++) {
 			m_handIndex[OtherPlayersIn[i].MyHand] = i;
 		}
+		removedHand.Pieces.Clear ();
 	}
 
 	private void refillHands(List<SPlayer> playersIn, int index) {
