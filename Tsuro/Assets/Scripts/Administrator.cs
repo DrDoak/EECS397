@@ -107,15 +107,6 @@ public class Administrator {
 			List<Tile> legalTiles = GetLegalTiles (currentSPlayer);
 			if (legalTiles.Count == 0)
 				legalTiles = currentSPlayer.MyHand.Pieces;
-			if (legalTiles.Count == 0) {
-				Debug.Log ("BUG, " + p.GetName() + " should have tiles: ");
-				Debug.Log ("Deck: " + m_board.CurrentDeck.DrawDeck.Count);
-				Debug.Log ("Board: " + m_board.m_placedTiles.Keys.Count);
-
-				foreach( SPlayer pl in Players) {
-					Debug.Log(pl.MyPlayer.GetName() + " has: " + pl.MyHand.Pieces.Count + " is in?: " + m_board.CurrentPlayersIn.Contains(pl));
-				}
-			}
 			Tile t = p.PlayTurn (m_board, legalTiles, m_board.CurrentDeck.DrawDeck.Count);
 
 			t.SetCoordinate( currentSPlayer.Location.Coordinate);

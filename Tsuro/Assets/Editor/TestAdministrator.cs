@@ -144,24 +144,27 @@ public class TestAdministrator {
 
 	[Test]
 	public void PlayFourPlayer() {
-		Administrator a = new Administrator ();
-		Board b = new Board (new Vector2Int (6, 6));
-		a.SetBoard (b);
-		PlayerMachine pm = new PlayerMachine ("testPlayer1");
-		a.AddNewPlayer (pm);
-		PlayerMachine pm2 = new PlayerMachine ("testPlayer2");
-		pm2.AIType = PlayerAIType.ASYMMETRIC;
-		a.AddNewPlayer (pm2);
-		PlayerMachine pm3 = new PlayerMachine ("testPlayer3");
-		pm3.AIType = PlayerAIType.SYMMETRIC;
-		a.AddNewPlayer (pm3);
-		PlayerMachine pm4 = new PlayerMachine ("testPlayer4");
-		a.AddNewPlayer (pm4);
+		//Run 20 test games
+		for (int i = 0; i < 20; i++) {
+			Administrator a = new Administrator ();
+			Board b = new Board (new Vector2Int (6, 6));
+			a.SetBoard (b);
+			PlayerMachine pm = new PlayerMachine ("testPlayer1");
+			a.AddNewPlayer (pm);
+			PlayerMachine pm2 = new PlayerMachine ("testPlayer2");
+			pm2.AIType = PlayerAIType.ASYMMETRIC;
+			a.AddNewPlayer (pm2);
+			PlayerMachine pm3 = new PlayerMachine ("testPlayer3");
+			pm3.AIType = PlayerAIType.SYMMETRIC;
+			a.AddNewPlayer (pm3);
+			PlayerMachine pm4 = new PlayerMachine ("testPlayer4");
+			a.AddNewPlayer (pm4);
 
-		a.InitializeGame ();
+			a.InitializeGame ();
 
-		a.Play ();
-		Assert.AreEqual (1, b.CurrentPlayersIn.Count, "Only one player is the winner");
-		Assert.AreEqual (3, b.CurrentPlayersOut.Count, "A player is the loser");
+			a.Play ();
+			Assert.AreEqual (1, b.CurrentPlayersIn.Count, "Only one player is the winner");
+			Assert.AreEqual (3, b.CurrentPlayersOut.Count, "A player is the loser");
+		}
 	}
 }
