@@ -30,7 +30,7 @@ public class Administrator {
             return false;
         }
         return true;
-      }
+     }
 
     public bool HasLegalMoves (SPlayer sp, Board b)
     {
@@ -56,8 +56,7 @@ public class Administrator {
 		return LegalDirections;
 	}
 
-	public TurnOutput PlayATurn(List<Tile> DrawPile, List<SPlayer> PlayersIn, List<SPlayer> PlayersOut, Board b, Tile PlacedTile)
-    {
+	public TurnOutput PlayATurn(List<Tile> DrawPile, List<SPlayer> PlayersIn, List<SPlayer> PlayersOut, Board b, Tile PlacedTile) {
         TurnOutput to = new TurnOutput();
         SPlayer ActivePlayer = PlayersIn[0];
 		List<SPlayer> eliminatedPlayers = new List<SPlayer> ();
@@ -76,6 +75,7 @@ public class Administrator {
 		to.ContinueGame = (to.PlayersIn.Count > 1);
         return to;
     }
+
 	public void SetBoard(Board b) {
 		m_board = b;
 	}
@@ -97,29 +97,29 @@ public class Administrator {
 		TurnOutput currentTurnStatus = new TurnOutput ();
 		currentTurnStatus.ContinueGame = true;
 		int numTurns = 0;
+		m_currentPlayerIndex = -1;
 		while (currentTurnStatus.ContinueGame) {
-			SPlayer currentSPlayer = m_board.GetNextPlayer (m_board);
+			SPlayer currentSPlayer = GetNextPlayer (m_board.CurrentPlayersIn);
 
 			Player p = currentSPlayer.MyPlayer;
 			Tile t = p.PlayTurn (m_board, GetLegalTiles(currentSPlayer), m_board.CurrentDeck.DrawDeck.Count);
 
 			t.SetCoordinate( currentSPlayer.Location.Coordinate);
-			Debug.Log(p.GetName() + " is at position: " + currentSPlayer.Location.Coordinate);
 			currentSPlayer.MyHand.RemoveFromHand (t);
-
 
 			currentTurnStatus = PlayATurn (m_board.CurrentDeck.DrawDeck, m_board.CurrentPlayersIn,
 				m_board.CurrentPlayersOut, m_board, t);
 			
 			p.EndGame(currentTurnStatus.b, playerToColors(currentTurnStatus.PlayersIn));
-
-			numTurns++;
-			if (numTurns > 35) {
-				Debug.Log ("BADBADBADBADBAD: Infinite loop: This is not good : BADBADBADBADBAD");
-				break;
-			}
-			m_board.AdvancePlayerList ();
 		}
+	}
+	public SPlayer GetNextPlayer(List<SPlayer> playersIn) {
+		SPlayer nextPlayer = null;
+		do {
+			m_currentPlayerIndex = (m_currentPlayerIndex + 1)%Players.Count;
+			nextPlayer = Players [m_currentPlayerIndex];
+		} while(!playersIn.Contains(nextPlayer));
+		return nextPlayer;
 	}
 
 	public List<Tile> GetLegalTiles(SPlayer sp) {
@@ -135,7 +135,6 @@ public class Administrator {
 	}
 
 	private List<Color> playerToColors(List<SPlayer> playerList) {
-		//var res = m_playerMap.GroupBy(p => p.Value).ToDictionary(g => g.Key, g => g.Select(pp => pp.Key).ToList());
 		var colorList = new List<Color> ();
 		foreach (SPlayer p in playerList) {
 			colorList.Add(p.MyPlayer.PawnColor);

@@ -28,15 +28,6 @@ public class Board {
 		}
 		return false;
 	}
-	public SPlayer GetNextPlayer(Board b) {
-		return b.CurrentPlayersIn[0];
-	}
-	public void AdvancePlayerList()
-	{
-		SPlayer temp = CurrentPlayersIn [0];
-		CurrentPlayersIn.Remove(temp);
-		CurrentPlayersIn.Add(temp);
-	}
 
 	public void RemovePlayer(SPlayer p)
 	{
