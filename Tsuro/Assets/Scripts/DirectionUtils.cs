@@ -53,7 +53,6 @@ public static class DirectionUtils {
 				return Direction.RIGHT;
 			default:
 				throw new System.ArgumentException ();
-				return Direction.NONE;
 		}
 	}
 

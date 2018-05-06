@@ -16,11 +16,6 @@ public class SPlayer {
 		Location = new PlayerLocation (new Vector2Int (0, 0), 0);
 	}
 
-	public Tile PlayTile(Tile t) {
-		MyHand.RemoveFromHand (t);
-		return t;
-	}
-
 	public bool IsOnEdge (Vector2Int coord, Direction d)
     {
 		return (Location.Coordinate == coord && DirectionUtils.DirectionMatch (d, Location.PositionOnTile));
@@ -33,5 +28,10 @@ public class SPlayer {
 
 	public void MoveToPosition(PlayerLocation pl) {
 		Location = new PlayerLocation (pl.Coordinate, pl.PositionOnTile);
+	}
+
+	public Tile PlayTurn(Board b, int deckCount) {
+		List<Tile> legalTiles = b.GetLegalTiles (this);
+		return MyPlayer.PlayTurn (b, legalTiles, deckCount);
 	}
 }

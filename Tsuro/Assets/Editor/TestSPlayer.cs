@@ -19,7 +19,7 @@ public class TestSplayer {
 		SPlayer p = new SPlayer ();
 		p.MyHand.AddToHand (t);
 		Assert.True (p.MyHand.IsInHand (t), "Basic Hand Tile addition");
-		p.PlayTile (t);
+		p.MyHand.RemoveFromHand (t);
 		Assert.False (p.MyHand.IsInHand (t), "Basic Hand Tile Playing");
 	}
 

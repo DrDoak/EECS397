@@ -9,19 +9,27 @@ public class Board {
 	public readonly Vector2Int BoardSize;
 	public Dictionary<Vector2Int,Tile> m_placedTiles;
     public readonly Deck CurrentDeck;
+	public Administrator Admin;
+
+	private List<SPlayer> m_players;
+	private int m_currentPlayerIndex;
 
 	public Board (Vector2Int size) {
 		BoardSize = size;
 		m_placedTiles = new Dictionary<Vector2Int,Tile> ();
 		CurrentPlayersIn = new List<SPlayer>();
 		CurrentPlayersOut = new List<SPlayer> ();
+		m_players = new List<SPlayer> ();
+
 		CurrentDeck = new Deck();
+		m_currentPlayerIndex = 0;
 	}
 
 	public bool AddNewPlayer(SPlayer sp, PlayerLocation ploc) { 
 		if (ploc.IsEdgePosition(BoardSize) &&
 			GetPlayersAtLocation (ploc, sp).Count == 0) {
 			CurrentPlayersIn.Add(sp);
+			m_players.Add (sp);
 			sp.MoveToPosition(ploc);
 			CurrentDeck.OnPlayerAdd (sp.MyHand, CurrentPlayersIn);
 			return true;
@@ -135,12 +143,30 @@ public class Board {
 		return (coord.x >= 0 && coord.x < BoardSize.x 
 			&& coord.y >= 0 && coord.y < BoardSize.y);
 	}
-
+	public SPlayer GetCurrentPlayer() {
+		return m_players[m_currentPlayerIndex];
+	}
 	public void AdvancePlayers() {
 		if (CurrentPlayersIn.Count > 0) {
-			SPlayer temp = CurrentPlayersIn [0];
-			CurrentPlayersIn.Remove (temp);
-			CurrentPlayersIn.Add (temp);
+			SPlayer nextPlayer = null;
+			do {
+				m_currentPlayerIndex = (m_currentPlayerIndex + 1)%m_players.Count;
+				nextPlayer = m_players [m_currentPlayerIndex];
+			} while(!CurrentPlayersIn.Contains(nextPlayer));
 		}
+	}
+
+	public List<Tile> GetLegalTiles(SPlayer sp) {
+		List<Tile> legalTiles = new List<Tile> ();
+		foreach (Tile t in sp.MyHand.Pieces) {
+			List<Direction> legalDirs = Admin.LegalTilePlayDirections (sp, t, this);
+			if (legalDirs.Count > 0) {
+				t.LegalDirections = legalDirs;
+				legalTiles.Add (t);
+			}
+		}
+		if (legalTiles.Count == 0)
+			legalTiles = sp.MyHand.Pieces;
+		return legalTiles;
 	}
 }

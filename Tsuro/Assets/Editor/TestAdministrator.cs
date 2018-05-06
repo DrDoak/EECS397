@@ -163,8 +163,8 @@ public class TestAdministrator {
 			a.InitializeGame ();
 
 			a.Play ();
-			Assert.AreEqual (1, b.CurrentPlayersIn.Count, "Only one player is the winner");
-			Assert.AreEqual (3, b.CurrentPlayersOut.Count, "A player is the loser");
+			Assert.IsTrue ((b.CurrentPlayersIn.Count == 1 && b.CurrentPlayersOut.Count == 3) || 
+				(b.CurrentPlayersIn.Count == 0 && b.CurrentPlayersOut.Count == 4),"Valid win conditions");
 		}
 	}
 }

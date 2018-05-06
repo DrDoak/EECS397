@@ -53,7 +53,6 @@ public class PlayerMachine : Player {
 			return Random.Range((int)6,(int)7);
 		default:
 			throw new System.ArgumentException ();
-			return 0;
 		}
 	}
 	public override Tile PlayTurn(Board b, List<Tile> legalTiles, int drawdeckcount)
@@ -100,36 +99,3 @@ public class PlayerMachine : Player {
 		return uniqueTiles.Count;
 	}
 }
-
-/*	//Make sure it is a legal play first
-private Tile ChooseAsymmetricTile (List<Tile> legalTiles)
-{
-	int maxScore = int.MinValue;
-	Tile bestTile = legalTiles [0];
-	foreach (Tile t in legalTiles) {
-		int sc = UniqueRotationTiles (t);
-		if (sc > maxScore) {
-			bestTile = t;
-			maxScore = sc;
-		}
-	}
-	Direction d = bestTile.LegalDirections[Random.Range(0, bestTile.LegalDirections.Count - 1)];
-	bestTile.SetRotation(d);
-	return bestTile;
-}
-//Make sure it is a legal play first
-private Tile ChooseSymmetricTile (List<Tile> legalTiles)
-{
-	int minScore = int.MaxValue;
-	Tile bestTile = legalTiles[0];
-	foreach (Tile t in legalTiles) {
-		int sc = UniqueRotationTiles (t);
-		if (sc < minScore) {
-			bestTile = t;
-			minScore = sc;
-		}
-	}
-	Direction d = bestTile.LegalDirections[Random.Range(0, bestTile.LegalDirections.Count - 1)];
-	bestTile.SetRotation(d);
-	return bestTile;
-}*/

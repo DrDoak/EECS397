@@ -9,7 +9,7 @@ public class Administrator {
 
 	public List<SPlayer> Players;
 	private List<Color> m_pieceColors;
-	private int m_currentPlayerIndex = 0;
+
 	private Board m_board;
 
 	public Administrator () {
@@ -18,19 +18,27 @@ public class Administrator {
 	}
 
     public bool LegalPlay (SPlayer sp, Board b, Tile t) {
-		if (!(t.Coordinate == sp.Location.Coordinate)) {
+		if (!(t.Coordinate == sp.Location.Coordinate))
 			return false;
-		}
         if (!(sp.MyHand.IsInHand(t)))
-        {
             return false;
-        }
 		if (b.IsPlayerEliminated (sp, t) && HasLegalMoves (sp, b))
-        {
             return false;
-        }
         return true;
-     }
+    }
+
+	public TurnOutput PlayATurn(List<Tile> DrawPile, List<SPlayer> PlayersIn, List<SPlayer> PlayersOut, Board b, Tile PlacedTile) {
+		SPlayer ActivePlayer = b.GetCurrentPlayer ();
+		List<SPlayer> eliminatedPlayers = new List<SPlayer> ();
+		foreach (SPlayer p in b.GetAdjacentPlayers(PlacedTile))
+			eliminatedPlayers.AddRange(b.MovePlayer (p, PlacedTile));
+		b.PlaceTile (PlacedTile);
+		foreach (SPlayer sp in eliminatedPlayers)
+			b.RemovePlayer (sp);
+		if (b.CurrentPlayersIn.Contains(ActivePlayer) && ActivePlayer.MyHand.Pieces.Count < 3)
+			b.CurrentDeck.DrawCard (ActivePlayer.MyHand);
+		return getTurnOutput (b);
+	}
 
     public bool HasLegalMoves (SPlayer sp, Board b)
     {
@@ -46,40 +54,17 @@ public class Administrator {
 
 	public List<Direction> LegalTilePlayDirections(SPlayer sp, Tile t, Board b) {
 		List<Direction> LegalDirections = new List<Direction> ();
-		for (int i = 0; i < 4; i++)
-		{
+		for (int i = 0; i < 4; i++) {
 			t.SetRotation((Direction)i);
-			if (!b.IsPlayerEliminated (sp, t)) {
+			if (!b.IsPlayerEliminated (sp, t))
 				LegalDirections.Add ((Direction)i);
-			}
 		}
 		return LegalDirections;
 	}
 
-	public TurnOutput PlayATurn(List<Tile> DrawPile, List<SPlayer> PlayersIn, List<SPlayer> PlayersOut, Board b, Tile PlacedTile) {
-        TurnOutput to = new TurnOutput();
-        SPlayer ActivePlayer = PlayersIn[0];
-		List<SPlayer> eliminatedPlayers = new List<SPlayer> ();
-		foreach (SPlayer p in b.GetAdjacentPlayers(PlacedTile))
-			eliminatedPlayers.AddRange(b.MovePlayer (p, PlacedTile));
-		b.PlaceTile (PlacedTile);
-		foreach (SPlayer sp in eliminatedPlayers) {
-			b.RemovePlayer (sp);
-		}
-		to.PlayersIn = b.CurrentPlayersIn;
-		to.PlayersOut = b.CurrentPlayersOut;
-		to.b = b;
-		if (b.CurrentPlayersIn.Contains(ActivePlayer) && ActivePlayer.MyHand.Pieces.Count < 3) {
-			b.CurrentDeck.DrawCard (ActivePlayer.MyHand);
-			//Debug.Log (ActivePlayer.MyPlayer.GetName () + " has: " + ActivePlayer.MyHand.Pieces.Count);
-		}
-		to.DrawPile = b.CurrentDeck.DrawDeck;
-		to.ContinueGame = (to.PlayersIn.Count > 1);
-        return to;
-    }
-
 	public void SetBoard(Board b) {
 		m_board = b;
+		b.Admin = this;
 	}
 	public void AddNewPlayer(Player p) {
 		SPlayer newSPlayer = new SPlayer (p);
@@ -99,44 +84,19 @@ public class Administrator {
 		TurnOutput currentTurnStatus = new TurnOutput ();
 		currentTurnStatus.ContinueGame = true;
 		int numTurns = 0;
-		m_currentPlayerIndex = -1;
 		while (currentTurnStatus.ContinueGame) {
-			SPlayer currentSPlayer = GetNextPlayer (m_board.CurrentPlayersIn);
+			SPlayer currentSPlayer = m_board.GetCurrentPlayer ();
 
-			Player p = currentSPlayer.MyPlayer;
-			List<Tile> legalTiles = GetLegalTiles (currentSPlayer);
-			if (legalTiles.Count == 0)
-				legalTiles = currentSPlayer.MyHand.Pieces;
-			Tile t = p.PlayTurn (m_board, legalTiles, m_board.CurrentDeck.DrawDeck.Count);
+			Tile t = currentSPlayer.PlayTurn (m_board, m_board.CurrentDeck.DrawDeck.Count);
 
 			t.SetCoordinate( currentSPlayer.Location.Coordinate);
 			currentSPlayer.MyHand.RemoveFromHand (t);
 
 			currentTurnStatus = PlayATurn (m_board.CurrentDeck.DrawDeck, m_board.CurrentPlayersIn,
 				m_board.CurrentPlayersOut, m_board, t);
-			p.EndGame(currentTurnStatus.b, playerToColors(currentTurnStatus.PlayersIn));
+			currentSPlayer.MyPlayer.EndGame(currentTurnStatus.b, playerToColors(currentTurnStatus.PlayersIn));
 			m_board.AdvancePlayers ();
 		}
-	}
-	public SPlayer GetNextPlayer(List<SPlayer> playersIn) {
-		SPlayer nextPlayer = null;
-		do {
-			m_currentPlayerIndex = (m_currentPlayerIndex + 1)%Players.Count;
-			nextPlayer = Players [m_currentPlayerIndex];
-		} while(!playersIn.Contains(nextPlayer));
-		return nextPlayer;
-	}
-
-	public List<Tile> GetLegalTiles(SPlayer sp) {
-		List<Tile> legalTiles = new List<Tile> ();
-		foreach (Tile t in sp.MyHand.Pieces) {
-			List<Direction> legalDirs = LegalTilePlayDirections (sp, t, m_board);
-			if (legalDirs.Count > 0) {
-				t.LegalDirections = legalDirs;
-				legalTiles.Add (t);
-			}
-		}
-		return legalTiles;
 	}
 
 	private List<Color> playerToColors(List<SPlayer> playerList) {
@@ -147,7 +107,15 @@ public class Administrator {
 		return colorList;
 	}
 
-
+	private TurnOutput getTurnOutput(Board b) {
+		TurnOutput to = new TurnOutput();
+		to.PlayersIn = b.CurrentPlayersIn;
+		to.PlayersOut = b.CurrentPlayersOut;
+		to.b = b;
+		to.DrawPile = b.CurrentDeck.DrawDeck;
+		to.ContinueGame = (to.PlayersIn.Count > 1);
+		return to;
+	}
 }
 
 public class TurnOutput
