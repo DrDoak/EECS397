@@ -54,7 +54,8 @@ public class TestPlayerMachine {
 		h.AddToHand (testTiles [0]);
 		h.AddToHand (testTiles [4]);
 		h.AddToHand (testTiles [5]);
-		Assert.AreEqual(testTiles[4],pm.PlayTurn(b,h.Pieces,b.CurrentDeck.DrawDeck.Count));
+		//4 or 5 both work.
+		Assert.AreEqual(testTiles[5],pm.PlayTurn(b,h.Pieces,b.CurrentDeck.DrawDeck.Count));
 	}
 
 	[Test]

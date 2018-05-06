@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public enum PlayerAIType { RANDOM, SYMMETRIC, ASYMMETRIC}
 
@@ -10,10 +11,7 @@ public class PlayerMachine : Player {
 	public PlayerAIType AIType = PlayerAIType.RANDOM;
 	public Administrator Admin;
 
-    public override string GetName()
-    {
-        return base.GetName();
-    }
+    public override string GetName() { return base.GetName(); }
 
     public override PlayerLocation PlacePawn(Board b)
     {
@@ -60,13 +58,14 @@ public class PlayerMachine : Player {
 	}
 	public override Tile PlayTurn(Board b, List<Tile> legalTiles, int drawdeckcount)
 	{
+		SortSymmetry (legalTiles);
 		switch (AIType) {
 		case (PlayerAIType.RANDOM):
 			return ChooseRandomTile (legalTiles);
 		case(PlayerAIType.SYMMETRIC):
-			return ChooseSymmetricTile (legalTiles);
+			return legalTiles[0];
 		case(PlayerAIType.ASYMMETRIC):
-			return ChooseAsymmetricTile(legalTiles);
+			return legalTiles[legalTiles.Count - 1];
 		default:
 			return legalTiles [0];
 		}
@@ -74,46 +73,15 @@ public class PlayerMachine : Player {
 
 	private Tile ChooseRandomTile(List<Tile> legalTiles)
     {
-		if (legalTiles.Count == 0)
-			Debug.Log ("Why don't I have tiles?");
 		Tile t = legalTiles[Random.Range(0, legalTiles.Count - 1)];
 		Direction d = t.LegalDirections[Random.Range(0, t.LegalDirections.Count - 1)];
         t.SetRotation(d);
         return t;
     }
 
-	//Make sure it is a legal play first
-	private Tile ChooseAsymmetricTile (List<Tile> legalTiles)
-    {
-		int maxScore = int.MinValue;
-		Tile bestTile = legalTiles [0];
-		foreach (Tile t in legalTiles) {
-			int sc = UniqueRotationTiles (t);
-			if (sc > maxScore) {
-				bestTile = t;
-				maxScore = sc;
-			}
-		}
-		Direction d = bestTile.LegalDirections[Random.Range(0, bestTile.LegalDirections.Count - 1)];
-		bestTile.SetRotation(d);
-		return bestTile;
-    }
-	//Make sure it is a legal play first
-	private Tile ChooseSymmetricTile (List<Tile> legalTiles)
-    {
-		int minScore = int.MaxValue;
-		Tile bestTile = legalTiles[0];
-		foreach (Tile t in legalTiles) {
-			int sc = UniqueRotationTiles (t);
-			if (sc < minScore) {
-				bestTile = t;
-				minScore = sc;
-			}
-		}
-		Direction d = bestTile.LegalDirections[Random.Range(0, bestTile.LegalDirections.Count - 1)];
-		bestTile.SetRotation(d);
-		return bestTile;
-    }
+	private void SortSymmetry(List<Tile> legalTiles) {
+		legalTiles.Sort((a,b) => (UniqueRotationTiles(a).CompareTo(UniqueRotationTiles(b))));
+	}
 
     public override void EndGame(Board b, List<Color> player_colors)
     {
@@ -132,3 +100,36 @@ public class PlayerMachine : Player {
 		return uniqueTiles.Count;
 	}
 }
+
+/*	//Make sure it is a legal play first
+private Tile ChooseAsymmetricTile (List<Tile> legalTiles)
+{
+	int maxScore = int.MinValue;
+	Tile bestTile = legalTiles [0];
+	foreach (Tile t in legalTiles) {
+		int sc = UniqueRotationTiles (t);
+		if (sc > maxScore) {
+			bestTile = t;
+			maxScore = sc;
+		}
+	}
+	Direction d = bestTile.LegalDirections[Random.Range(0, bestTile.LegalDirections.Count - 1)];
+	bestTile.SetRotation(d);
+	return bestTile;
+}
+//Make sure it is a legal play first
+private Tile ChooseSymmetricTile (List<Tile> legalTiles)
+{
+	int minScore = int.MaxValue;
+	Tile bestTile = legalTiles[0];
+	foreach (Tile t in legalTiles) {
+		int sc = UniqueRotationTiles (t);
+		if (sc < minScore) {
+			bestTile = t;
+			minScore = sc;
+		}
+	}
+	Direction d = bestTile.LegalDirections[Random.Range(0, bestTile.LegalDirections.Count - 1)];
+	bestTile.SetRotation(d);
+	return bestTile;
+}*/
