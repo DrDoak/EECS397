@@ -47,13 +47,13 @@ public class Deck
 
     public Hand DragonTileHand;
 
-    public List<Tile> DrawDeck { get; private set; }
+    public List<Tile> Pieces { get; private set; }
 
 	private Dictionary<Hand,int> m_handIndex;
 
     public Deck()
     {
-        DrawDeck = new List<Tile>();
+        Pieces = new List<Tile>();
 		m_handIndex = new Dictionary<Hand,int> ();
 
         for (int i = 0; i < 35; i++)
@@ -66,17 +66,26 @@ public class Deck
                 path.y = CompleteDeck[i, j, 1];
                 AllPaths.Add(path);
             }
-            DrawDeck.Add(new Tile(AllPaths));       
+            Pieces.Add(new Tile(AllPaths));       
         }
     }
 
+	public void Shuffle() {
+		for (int i = 0; i < Pieces.Count; i++) {
+			Tile temp = Pieces[i];
+			int randomIndex = Random.Range(i, Pieces.Count);
+			Pieces[i] = Pieces[randomIndex];
+			Pieces[randomIndex] = temp;
+		}
+	}
+
 	public void DrawCard(Hand h)
     {
-        if (DrawDeck.Count > 0)
+        if (Pieces.Count > 0)
         {
-            Tile t = DrawDeck[0];
+            Tile t = Pieces[0];
             h.AddToHand(t);
-            DrawDeck.Remove(t);
+            Pieces.Remove(t);
         }
         else if (DragonTileHand == null)
         {
@@ -94,7 +103,7 @@ public class Deck
 			Debug.LogError ("Attempting to remove Hand before being added");
 		int removedIndex = m_handIndex [removedHand];
 		foreach (Tile t in removedHand.Pieces) {
-			DrawDeck.Add (t);
+			Pieces.Add (t);
 		}
 		if (DragonTileHand == removedHand) {
 			int index = (removedIndex ) % OtherPlayersIn.Count;
@@ -112,7 +121,7 @@ public class Deck
 
 	private void refillHands(List<SPlayer> playersIn, int index) {
 		int numberWithThree = 0;
-		while (DrawDeck.Count > 0) {
+		while (Pieces.Count > 0) {
 			if (DragonTileHand.Pieces.Count >= 3) {
 				numberWithThree++;
 				if (numberWithThree == (playersIn.Count))

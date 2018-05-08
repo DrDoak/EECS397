@@ -22,8 +22,8 @@ public class TestAdministrator {
 		Tile oldTile = p1.MyHand.RemoveFromHand (p1.MyHand.Pieces[2]);
 		oldTile.SetCoordinate (new Vector2Int (0, 0));
 		oldTile.SetRotation(Direction.UP);
-		//a.PlayATurn (b.CurrentDeck.DrawDeck, b.CurrentPlayersIn, b.CurrentPlayersOut, b,oldTile);
-		a.PlayATurn(b.CurrentDeck.DrawDeck,b.CurrentPlayersIn, b.CurrentPlayersOut, b, oldTile);
+		//a.PlayATurn (b.CurrentDeck.Pieces, b.CurrentPlayersIn, b.CurrentPlayersOut, b,oldTile);
+		a.PlayATurn(b.CurrentDeck.Pieces,b.CurrentPlayersIn, b.CurrentPlayersOut, b, oldTile);
 		Debug.Assert (p1.Location.Coordinate == new Vector2Int (2, 0), "Player moves across two spaces");
 	}
 
@@ -52,7 +52,7 @@ public class TestAdministrator {
 		p1.MyHand.Pieces [1].SetCoordinate(new Vector2Int (0, 0));
 		p1.MyHand.Pieces[1].SetRotation(Direction.RIGHT);
 		Assert.True(a.LegalPlay(p1, b, p1.MyHand.Pieces[1]), "Determines that the play is legal after a rotation");
-		Assert.False(a.LegalPlay(p1,b,b.CurrentDeck.DrawDeck[14]), "Determines that the play is illegal due to tile not being in hand");
+		Assert.False(a.LegalPlay(p1,b,b.CurrentDeck.Pieces[14]), "Determines that the play is illegal due to tile not being in hand");
 	}
 
 	[Test]
@@ -67,7 +67,7 @@ public class TestAdministrator {
 		//making a move where multiple players move at once
 		Tile oldThirdTile = p1.MyHand.RemoveFromHand (p1.MyHand.Pieces[2]);
 
-		Assert.True (a.PlayATurn (b.CurrentDeck.DrawDeck, b.CurrentPlayersIn, b.CurrentPlayersOut, b,oldThirdTile).ContinueGame, "Determines that a play did not end the game");
+		Assert.True (a.PlayATurn (b.CurrentDeck.Pieces, b.CurrentPlayersIn, b.CurrentPlayersOut, b,oldThirdTile).ContinueGame, "Determines that a play did not end the game");
 
 		Assert.AreEqual(new Vector2Int (1, 0), p1.Location.Coordinate ,  "Player one moved to correct location");
 		Assert.AreEqual (new Vector2Int (0, 1), p2.Location.Coordinate , "Player two moved to correct location");
@@ -88,8 +88,8 @@ public class TestAdministrator {
 		Tile oldTile = p1.MyHand.RemoveFromHand (p1.MyHand.Pieces[2]);
 		oldTile.SetCoordinate (new Vector2Int (0, 0));
 		oldTile.SetRotation(Direction.UP);
-		//a.PlayATurn (b.CurrentDeck.DrawDeck, b.CurrentPlayersIn, b.CurrentPlayersOut, b,oldTile);
-		a.PlayATurn(b.CurrentDeck.DrawDeck,b.CurrentPlayersIn, b.CurrentPlayersOut, b, oldTile);
+		//a.PlayATurn (b.CurrentDeck.Pieces, b.CurrentPlayersIn, b.CurrentPlayersOut, b,oldTile);
+		a.PlayATurn(b.CurrentDeck.Pieces,b.CurrentPlayersIn, b.CurrentPlayersOut, b, oldTile);
 		Debug.Assert (p1.Location.Coordinate == new Vector2Int (2, 0), "Player moves across two spaces");
 	}
 
@@ -145,9 +145,9 @@ public class TestAdministrator {
 	[Test]
 	public void PlayFourPlayer() {
 		//Run 20 test games
-		for (int i = 0; i < 20; i++) {
+		for (int i = 0; i < 200; i++) {
 			Administrator a = new Administrator ();
-			Board b = new Board (new Vector2Int (6, 6));
+			Board b = new Board (new Vector2Int (6, 6),true);
 			a.SetBoard (b);
 			PlayerMachine pm = new PlayerMachine ("testPlayer1");
 			a.AddNewPlayer (pm);

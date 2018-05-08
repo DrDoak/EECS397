@@ -16,8 +16,8 @@ public class TestPlayerMachine {
 	public void PlacePawnTest() {
 		Board b = new Board ( new Vector2Int(6,6));
 		PlayerMachine pm = new PlayerMachine ("pete");
-		//Run 20 tests to ensure it is always on an edge position
-		for (int i = 0; i < 20; i++) { 
+		//Run 200 tests to ensure it is always on an edge position
+		for (int i = 0; i < 200; i++) { 
 			PlayerLocation pl = pm.PlacePawn (b);
 			Assert.IsTrue (pl.IsEdgePosition (b.BoardSize), "Is correct edge position");
 		}
@@ -55,7 +55,7 @@ public class TestPlayerMachine {
 		h.AddToHand (testTiles [4]);
 		h.AddToHand (testTiles [5]);
 		//4 or 5 both work.
-		Assert.AreEqual(testTiles[5],pm.PlayTurn(b,h.Pieces,b.CurrentDeck.DrawDeck.Count));
+		Assert.AreEqual(testTiles[5],pm.PlayTurn(b,h.Pieces,b.CurrentDeck.Pieces.Count));
 	}
 
 	[Test]
@@ -68,7 +68,7 @@ public class TestPlayerMachine {
 		h.AddToHand (testTiles [0]);
 		h.AddToHand (testTiles [4]);
 		h.AddToHand (testTiles [5]);
-		Assert.AreEqual(testTiles[0],pm.PlayTurn(b,h.Pieces,b.CurrentDeck.DrawDeck.Count));
+		Assert.AreEqual(testTiles[0],pm.PlayTurn(b,h.Pieces,b.CurrentDeck.Pieces.Count));
 	}
 
 	[Test]

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player
+public class Player : IPlayer
 {
 
 	protected string Name = "Player Name";
@@ -35,7 +35,7 @@ public class Player
         return pl;
     }
 
-	public virtual Tile PlayTurn(Board b, List<Tile> legalTiles, int drawdeckcount)
+	public virtual Tile PlayTurn(Board b, List<Tile> legalTiles, int Piecescount)
     {
 		return legalTiles[0];
     }

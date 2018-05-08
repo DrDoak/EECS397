@@ -19,17 +19,17 @@ public class PlayerMachine : Player {
 		do {
 			Vector2Int coord = new Vector2Int(0,0);
 			int positionOnTile = 0;
-			if (Random.Range(1,2) == 1) {
-				coord.x =  (b.BoardSize.x - 1) * Random.Range ((int)0, (int)1);
-				coord.y =  Random.Range(0, b.BoardSize.y - 1);
+			if (Random.Range(1,3) == 1) {
+				coord.x =  (b.BoardSize.x - 1) * Random.Range ((int)0, (int)2);
+				coord.y =  Random.Range(0, b.BoardSize.y);
 				if (coord.x == 0) {
 					positionOnTile = randomIntAlongDirection(Direction.LEFT);
 				} else {
 					positionOnTile = randomIntAlongDirection(Direction.RIGHT);
 				}
 			} else {
-				coord.y =  (b.BoardSize.y - 1) * Random.Range ((int)0, (int)1);
-				coord.x =  Random.Range(0, b.BoardSize.x - 1);
+				coord.y =  (b.BoardSize.y - 1) * Random.Range ((int)0, (int)2);
+				coord.x =  Random.Range(0, b.BoardSize.x);
 				if (coord.y == 0) {
 					positionOnTile = randomIntAlongDirection(Direction.DOWN);
 				} else {
@@ -44,18 +44,18 @@ public class PlayerMachine : Player {
 	private int randomIntAlongDirection( Direction d) {
 		switch (d) {
 		case Direction.UP:
-			return Random.Range((int)0,(int)1);
+			return Random.Range((int)0,(int)2);
 		case Direction.RIGHT:
-			return Random.Range((int)2,(int)3);
+			return Random.Range((int)2,(int)4);
 		case Direction.DOWN:
-			return Random.Range((int)4,(int)5);
+			return Random.Range((int)4,(int)6);
 		case Direction.LEFT:
-			return Random.Range((int)6,(int)7);
+			return Random.Range((int)6,(int)8);
 		default:
 			throw new System.ArgumentException ();
 		}
 	}
-	public override Tile PlayTurn(Board b, List<Tile> legalTiles, int drawdeckcount)
+	public override Tile PlayTurn(Board b, List<Tile> legalTiles, int Piecescount)
 	{
 		SortSymmetry (legalTiles);
 		switch (AIType) {
@@ -72,8 +72,8 @@ public class PlayerMachine : Player {
 
 	private Tile ChooseRandomTile(List<Tile> legalTiles)
     {
-		Tile t = legalTiles[Random.Range(0, legalTiles.Count - 1)];
-		Direction d = t.LegalDirections[Random.Range(0, t.LegalDirections.Count - 1)];
+		Tile t = legalTiles[Random.Range(0, legalTiles.Count)];
+		Direction d = t.LegalDirections[Random.Range(0, t.LegalDirections.Count)];
         t.SetRotation(d);
         return t;
     }

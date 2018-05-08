@@ -1,7 +1,6 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-
+using System.Collections.Generic;
 
 public class Administrator {
 	public List<Color> AllPlayerColors = new List<Color>() 
@@ -17,22 +16,22 @@ public class Administrator {
 		Players = new List<SPlayer> ();
 	}
 
-    public bool LegalPlay (SPlayer sp, Board b, Tile t) {
+	public bool LegalPlay (SPlayer sp, Board b, Tile t) {
 		if (!(t.Coordinate == sp.Location.Coordinate))
 			return false;
-        if (!(sp.MyHand.IsInHand(t)))
-            return false;
+		if (!(sp.MyHand.IsInHand(t)))
+			return false;
 		if (b.IsPlayerEliminated (sp, t) && HasLegalMoves (sp, b))
-            return false;
-        return true;
-    }
+			return false;
+		return true;
+	}
 
 	public TurnOutput PlayATurn(List<Tile> DrawPile, List<SPlayer> PlayersIn, List<SPlayer> PlayersOut, Board b, Tile PlacedTile) {
+		b.PlaceTile (PlacedTile);
 		SPlayer ActivePlayer = b.GetCurrentPlayer ();
 		List<SPlayer> eliminatedPlayers = new List<SPlayer> ();
 		foreach (SPlayer p in b.GetAdjacentPlayers(PlacedTile))
 			eliminatedPlayers.AddRange(b.MovePlayer (p, PlacedTile));
-		b.PlaceTile (PlacedTile);
 		foreach (SPlayer sp in eliminatedPlayers)
 			b.RemovePlayer (sp);
 		if (b.CurrentPlayersIn.Contains(ActivePlayer) && ActivePlayer.MyHand.Pieces.Count < 3)
@@ -40,17 +39,17 @@ public class Administrator {
 		return getTurnOutput (b);
 	}
 
-    public bool HasLegalMoves (SPlayer sp, Board b)
-    {
-        foreach (Tile t in sp.MyHand.Pieces)
-        {
+	public bool HasLegalMoves (SPlayer sp, Board b)
+	{
+		foreach (Tile t in sp.MyHand.Pieces)
+		{
 			Tile tempT = new Tile(t.OriginalPaths);
 			tempT.SetCoordinate (sp.Location.Coordinate);
 			if (LegalTilePlayDirections (sp, tempT, b).Count > 0)
 				return true;
-        }  
-        return false;
-    }
+		}  
+		return false;
+	}
 
 	public List<Direction> LegalTilePlayDirections(SPlayer sp, Tile t, Board b) {
 		List<Direction> LegalDirections = new List<Direction> ();
@@ -74,10 +73,11 @@ public class Administrator {
 	public void InitializeGame() {
 		int i = 0;
 		foreach (SPlayer splayer in Players) {
+			splayer.PieceColor = m_pieceColors [i];
 			splayer.MyPlayer.Initialize (m_pieceColors[i],m_pieceColors);
-			i++;
 			PlayerLocation pLocation = splayer.MyPlayer.PlacePawn (m_board);
 			m_board.AddNewPlayer (splayer, pLocation);
+			i++;
 		}
 	}
 	public void Play () {
@@ -87,22 +87,40 @@ public class Administrator {
 		while (currentTurnStatus.ContinueGame) {
 			SPlayer currentSPlayer = m_board.GetCurrentPlayer ();
 
-			Tile t = currentSPlayer.PlayTurn (m_board, m_board.CurrentDeck.DrawDeck.Count);
+			Tile t = currentSPlayer.SelectTile (m_board, m_board.CurrentDeck.Pieces.Count);
+			if (!LegalPlay(currentSPlayer,m_board,t)) {
+				currentSPlayer.KickPlayerReplaceAI();
+				t = currentSPlayer.SelectTile (m_board, m_board.CurrentDeck.Pieces.Count);
+			}
 
 			t.SetCoordinate( currentSPlayer.Location.Coordinate);
 			currentSPlayer.MyHand.RemoveFromHand (t);
 
-			currentTurnStatus = PlayATurn (m_board.CurrentDeck.DrawDeck, m_board.CurrentPlayersIn,
+			currentTurnStatus = PlayATurn (m_board.CurrentDeck.Pieces, m_board.CurrentPlayersIn,
 				m_board.CurrentPlayersOut, m_board, t);
 			currentSPlayer.MyPlayer.EndGame(currentTurnStatus.b, playerToColors(currentTurnStatus.PlayersIn));
+
+			if (!LegalHand(currentSPlayer.MyHand,m_board))
+				currentSPlayer.KickPlayerReplaceAI();
 			m_board.AdvancePlayers ();
 		}
 	}
 
+	private bool LegalHand(Hand h , Board b) {
+		if (!h.IsValid ())
+			return false;
+		foreach(Tile t in h.Pieces)
+			if (b.IsOnBoard(t))
+				return false;
+		foreach(Tile t in h.Pieces)
+			if (b.CurrentDeck.Pieces.Contains(t))
+				return false;
+		return true;
+	}
 	private List<Color> playerToColors(List<SPlayer> playerList) {
 		var colorList = new List<Color> ();
 		foreach (SPlayer p in playerList) {
-			colorList.Add(p.MyPlayer.PawnColor);
+			colorList.Add(p.PieceColor);
 		}
 		return colorList;
 	}
@@ -112,7 +130,7 @@ public class Administrator {
 		to.PlayersIn = b.CurrentPlayersIn;
 		to.PlayersOut = b.CurrentPlayersOut;
 		to.b = b;
-		to.DrawPile = b.CurrentDeck.DrawDeck;
+		to.DrawPile = b.CurrentDeck.Pieces;
 		to.ContinueGame = (to.PlayersIn.Count > 1);
 		return to;
 	}
@@ -120,9 +138,9 @@ public class Administrator {
 
 public class TurnOutput
 {
-    public List<Tile> DrawPile;
-    public List<SPlayer> PlayersIn;
-    public List<SPlayer> PlayersOut;
-    public Board b;
-    public bool ContinueGame;
+	public List<Tile> DrawPile;
+	public List<SPlayer> PlayersIn;
+	public List<SPlayer> PlayersOut;
+	public Board b;
+	public bool ContinueGame;
 }

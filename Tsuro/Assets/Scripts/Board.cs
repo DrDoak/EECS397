@@ -14,7 +14,7 @@ public class Board {
 	private List<SPlayer> m_players;
 	private int m_currentPlayerIndex;
 
-	public Board (Vector2Int size) {
+	public Board (Vector2Int size, bool shuffleDeck = false) {
 		BoardSize = size;
 		m_placedTiles = new Dictionary<Vector2Int,Tile> ();
 		CurrentPlayersIn = new List<SPlayer>();
@@ -22,6 +22,8 @@ public class Board {
 		m_players = new List<SPlayer> ();
 
 		CurrentDeck = new Deck();
+		if (shuffleDeck)
+			CurrentDeck.Shuffle ();
 		m_currentPlayerIndex = 0;
 	}
 
@@ -82,6 +84,7 @@ public class Board {
 		if (colP.Count > 0) {
 			playersEliminated.Add (sp);
 			playersEliminated.AddRange (colP);
+			return playersEliminated;
 		}
 		if (!isPositionInBoard (newCoord)) {
 			playersEliminated.Add (sp);
@@ -120,10 +123,9 @@ public class Board {
 	public List<SPlayer> GetAdjacentPlayers(Tile placedTile) {
 		List<SPlayer> pList = new List<SPlayer> ();
 		foreach (SPlayer p in CurrentPlayersIn) {
-			Vector2Int diff = p.Location.Coordinate - placedTile.Coordinate;
-			Direction d = DirectionUtils.VectorToDirection (diff);
-			if (p.Location.Coordinate == placedTile.Coordinate ||
-				d != Direction.NONE && p.IsOnEdge(placedTile.Coordinate + diff, DirectionUtils.InvertDirection(d))) {
+			//Vector2Int diff = p.Location.Coordinate - placedTile.Coordinate;
+			//Direction d = DirectionUtils.VectorToDirection (diff);
+			if (p.Location.Coordinate == placedTile.Coordinate) {
 				pList.Add (p);
 			}
 		}
@@ -168,5 +170,9 @@ public class Board {
 		if (legalTiles.Count == 0)
 			legalTiles = sp.MyHand.Pieces;
 		return legalTiles;
+	}
+
+	public bool IsOnBoard(Tile t) {
+		return (m_placedTiles.ContainsValue (t));
 	}
 }

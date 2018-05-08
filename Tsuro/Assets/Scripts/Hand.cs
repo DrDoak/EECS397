@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class Hand {
 
@@ -31,5 +32,8 @@ public class Hand {
         Pieces.Remove(t);
 		return t;
     }
+	public bool IsValid() {
+		return (Pieces.Count <= 3 && ((Pieces.Count - Pieces.Distinct ().Count()) == 0));
+	}
     
 }
