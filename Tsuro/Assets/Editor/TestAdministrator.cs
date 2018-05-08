@@ -143,8 +143,7 @@ public class TestAdministrator {
 	}
 
 	[Test]
-	public void PlayFourPlayer() {
-		//Run 20 test games
+	public void Play200FourPlayerGames() {
 		for (int i = 0; i < 200; i++) {
 			Administrator a = new Administrator ();
 			Board b = new Board (new Vector2Int (6, 6),true);

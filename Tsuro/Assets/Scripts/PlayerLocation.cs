@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using NUnit.Framework;
 
 public class PlayerLocation
 {
@@ -11,7 +10,6 @@ public class PlayerLocation
 
     public PlayerLocation(Vector2Int m_coordinate, int m_position)
     {
-		Assert.IsTrue (m_position >= 0 && m_position <= 7);
         Coordinate = m_coordinate;
 		PositionOnTile = m_position;
     }
